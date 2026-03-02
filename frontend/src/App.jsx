@@ -2,19 +2,21 @@ import { useState } from "react";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
+import "./index.css";
+import Navbar from "./components/Navbar";
+import { Routes, Route, Navigate } from "react-router-dom";
+import Dashboard from "./components/Dashboard";
+import StudyAreas from "./components/StudyAreas";
 
 function App() {
-  const [count, setCount] = useState(0);
-
   return (
-    <>
-      <div className="font-poppins">
-        <h1 className=" font-extrabold bg-blue-500 text-white p-12 rounded-full font-poppins">
-          Welcome to Smart Campus Companion
-        </h1>
-        <p className="text-2xl">Hello Evr</p>
-      </div>
-    </>
+    <Routes>
+      <Route path="/dashboard" element={<Dashboard />}></Route>
+      <Route path="studyareas" element={<StudyAreas />}></Route>
+
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      <Route path="*" element={<div>Not Found</div>} />
+    </Routes>
   );
 }
 
