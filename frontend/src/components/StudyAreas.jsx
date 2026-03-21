@@ -1,191 +1,148 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { io } from "socket.io-client";
 import Navbar from "./Navbar";
 
+const socket = io("http://localhost:5000");
+
 const StudyAreas = () => {
-  const [areas, setAreas] = useState(mockAreas);
+  const [areas, setAreas] = useState([]);
   const [selectedArea, setSelectedArea] = useState(null);
+  const [activeBooking, setActiveBooking] = useState(null);
 
-  const handleCheckIn = (areaId, tableId) => {
-    const updated = areas.map((area) => {
-      if (area.id !== areaId) return area;
+  const token = localStorage.getItem("token");
 
-      const updatedTables = area.tables.map((table) => {
-        if (table.id !== tableId) return table;
+  // 🔹 Load spaces
+  useEffect(() => {
+    fetch("http://localhost:5000/api/", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => res.json())
+      .then((data) => setAreas(data.spaces));
+  }, []);
 
-        if (table.occupiedSeats < table.totalSeats) {
-          return {
-            ...table,
-            occupiedSeats: table.occupiedSeats + 1,
-          };
-        }
+  // 🔹 Load active booking
+  useEffect(() => {
+    fetch("http://localhost:5000/api/bookings/active", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => res.json())
+      .then((data) => setActiveBooking(data.active));
+  }, []);
 
-        return table;
-      });
+  // 🔹 Load tables
+  const fetchTables = async (spaceId) => {
+    const res = await fetch(
+      `http://localhost:5000/api/spaces/${spaceId}/tables`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    );
 
-      return { ...area, tables: updatedTables };
+    const data = await res.json();
+
+    setSelectedArea({
+      ...data.space,
+      tables: data.tables,
     });
-
-    setAreas(updated);
-
-    if (selectedArea?.id === areaId) {
-      const updatedSelected = updated.find((a) => a.id === areaId);
-      setSelectedArea(updatedSelected);
-    }
   };
 
+  // 🔹 Booking
+  const handleCheckIn = async (tableId) => {
+    const res = await fetch("http://localhost:5000/api/bookings", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ tableId, seats: 1 }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) alert(data.message);
+    else setActiveBooking(data.booking);
+  };
+
+  // 🔹 Real-time updates
+  useEffect(() => {
+    socket.on("seatUpdated", ({ tableId, availableSeats }) => {
+      setSelectedArea((prev) => {
+        if (!prev) return prev;
+
+        return {
+          ...prev,
+          tables: prev.tables.map((t) =>
+            t._id === tableId ? { ...t, availableSeats } : t,
+          ),
+        };
+      });
+    });
+
+    return () => socket.off("seatUpdated");
+  }, []);
+
   return (
-    <div className="flex h-screen bg-gray-50 font-poppins">
+    <div className="flex h-screen bg-gray-50">
       <Navbar />
 
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <header className="p-6 border-b bg-white">
-          <h1 className="text-2xl font-semibold text-gray-900">Study Areas</h1>
-          <p className="text-sm text-gray-500">
-            Real-time seat availability simulation
-          </p>
-        </header>
+      <div className="flex-1 p-6">
+        <h1 className="text-xl font-bold mb-4">Study Spaces</h1>
 
-        <main className="flex-1 overflow-y-auto p-6 space-y-8">
-          {/* Area Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {areas.map((area) => {
-              const totalSeats = area.tables.reduce(
-                (sum, t) => sum + t.totalSeats,
-                0,
-              );
-              const occupiedSeats = area.tables.reduce(
-                (sum, t) => sum + t.occupiedSeats,
-                0,
-              );
-              const availableSeats = totalSeats - occupiedSeats;
-
-              return (
-                <div
-                  key={area.id}
-                  onClick={() => setSelectedArea(area)}
-                  className="cursor-pointer rounded-2xl bg-white border border-gray-200 shadow-sm p-6 hover:shadow-md transition"
-                >
-                  <h2 className="text-lg font-semibold text-gray-900">
-                    {area.name}
-                  </h2>
-                  <p className="text-sm text-gray-500 mt-1">{area.location}</p>
-
-                  <div className="mt-4 text-sm flex justify-between">
-                    <span>Total: {totalSeats}</span>
-                    <span>Available: {availableSeats}</span>
-                  </div>
-
-                  <StatusBadge available={availableSeats} total={totalSeats} />
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Tables Section */}
-          {selectedArea && (
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                {selectedArea.name} - Tables
-              </h2>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {selectedArea.tables.map((table) => {
-                  const available = table.totalSeats - table.occupiedSeats;
-
-                  return (
-                    <div
-                      key={table.id}
-                      className="rounded-2xl bg-white border border-gray-200 shadow-sm p-5"
-                    >
-                      <div className="flex justify-between items-center">
-                        <h3 className="font-semibold text-gray-900">
-                          Table {table.tableNo}
-                        </h3>
-                        <span className="text-xs text-gray-500 capitalize">
-                          {table.type}
-                        </span>
-                      </div>
-
-                      <div className="mt-3 text-sm text-gray-600">
-                        {available} / {table.totalSeats} seats available
-                      </div>
-
-                      <div className="mt-4 h-2 bg-gray-200 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-indigo-500 transition-all"
-                          style={{
-                            width: `${
-                              (table.occupiedSeats / table.totalSeats) * 100
-                            }%`,
-                          }}
-                        />
-                      </div>
-
-                      <button
-                        disabled={available === 0}
-                        onClick={() => handleCheckIn(selectedArea.id, table.id)}
-                        className={`mt-4 w-full py-2 rounded-xl text-sm font-medium transition ${
-                          available === 0
-                            ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                            : "bg-indigo-600 text-white hover:bg-indigo-700"
-                        }`}
-                      >
-                        {available === 0 ? "Full" : "Check In"}
-                      </button>
-                    </div>
-                  );
-                })}
-              </div>
+        {/* SPACES */}
+        <div className="grid grid-cols-3 gap-4">
+          {areas.map((area) => (
+            <div
+              key={area._id}
+              onClick={() => fetchTables(area._id)}
+              className="p-4 bg-white shadow rounded cursor-pointer"
+            >
+              <h2 className="font-semibold">{area.name}</h2>
+              <p>{area.location}</p>
+              <p>Available: {area.availableSeats}</p>
             </div>
-          )}
-        </main>
+          ))}
+        </div>
+
+        {/* TABLES */}
+        {selectedArea && (
+          <div className="mt-6">
+            <h2 className="text-lg font-bold mb-3">{selectedArea.name}</h2>
+
+            <div className="grid grid-cols-3 gap-4">
+              {selectedArea.tables.map((table) => {
+                const available = table.availableSeats;
+
+                return (
+                  <div key={table._id} className="p-4 bg-white shadow rounded">
+                    <h3>{table.code}</h3>
+                    <p>
+                      {available} / {table.capacity}
+                    </p>
+
+                    <button
+                      disabled={available === 0 || activeBooking}
+                      onClick={() => handleCheckIn(table._id)}
+                      className={`mt-2 w-full py-2 rounded ${
+                        available === 0 || activeBooking
+                          ? "bg-gray-300"
+                          : "bg-blue-500 text-white"
+                      }`}
+                    >
+                      {activeBooking
+                        ? "Already Booked"
+                        : available === 0
+                          ? "Full"
+                          : "Book"}
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
 };
-
-const StatusBadge = ({ available, total }) => {
-  let label = "Available";
-  let style = "bg-green-50 text-green-700";
-
-  if (available === 0) {
-    label = "Full";
-    style = "bg-red-50 text-red-700";
-  } else if (available / total < 0.25) {
-    label = "Nearly Full";
-    style = "bg-yellow-50 text-yellow-700";
-  }
-
-  return (
-    <div
-      className={`mt-4 inline-block px-3 py-1 text-xs rounded-lg font-medium ${style}`}
-    >
-      {label}
-    </div>
-  );
-};
-
-const mockAreas = [
-  {
-    id: "1",
-    name: "Main Library - Level 2",
-    location: "Library Building",
-    tables: [
-      { id: "t1", tableNo: 1, type: "group", totalSeats: 4, occupiedSeats: 2 },
-      { id: "t2", tableNo: 2, type: "group", totalSeats: 5, occupiedSeats: 4 },
-      { id: "t3", tableNo: 3, type: "single", totalSeats: 1, occupiedSeats: 0 },
-    ],
-  },
-  {
-    id: "2",
-    name: "Engineering Study Hall",
-    location: "Engineering Block",
-    tables: [
-      { id: "t4", tableNo: 1, type: "group", totalSeats: 4, occupiedSeats: 3 },
-      { id: "t5", tableNo: 2, type: "single", totalSeats: 1, occupiedSeats: 1 },
-      { id: "t6", tableNo: 3, type: "group", totalSeats: 5, occupiedSeats: 2 },
-    ],
-  },
-];
 
 export default StudyAreas;
