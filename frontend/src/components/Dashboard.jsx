@@ -49,6 +49,12 @@ const Dashboard = () => {
                 <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-red-500" />
               </button>
 
+              {/* Profile button */}
+              <button
+                onClick={() => navigate("/profile")}
+                className="flex items-center gap-2 pl-3 border-l border-gray-200"
+              ></button>
+
               <div className="flex items-center gap-3 pl-3 border-l border-gray-200">
                 <div className="hidden sm:block text-right leading-tight">
                   <p className="text-sm font-semibold text-gray-900">Student</p>
