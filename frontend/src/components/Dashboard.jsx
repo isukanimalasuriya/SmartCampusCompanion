@@ -68,7 +68,7 @@ const Dashboard = () => {
           <section className="rounded-3xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-6 md:p-8 shadow-lg">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
               <div>
-                <p className="text-white/80 text-sm">Good morning 👋</p>
+                <p className="text-white/80 text-sm">Good morning !</p>
                 <h2 className="text-2xl md:text-3xl font-semibold mt-1">
                   Everything you need, right on campus.
                 </h2>
