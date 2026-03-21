@@ -8,6 +8,7 @@ import { errorHandler } from "./middleware/errorHandler.js";
 
 import http from "http";
 import { Server } from "socket.io";
+import cors from "cors";
 
 dotenv.config();
 connectDB();
@@ -23,6 +24,12 @@ export const io = new Server(server, {
     origin: "*",
   },
 });
+
+// ✅ EXPRESS CORS MIDDLEWARE
+app.use(cors({
+  origin: "http://localhost:5173", // your frontend
+  credentials: true,               // needed if you use cookies or auth headers
+}));
 
 app.use(express.json());
 
