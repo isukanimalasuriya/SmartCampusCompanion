@@ -5,11 +5,18 @@ import authRoutes from "./routes/authRoutes.js";
 import spaceRoutes from "./routes/spaceRoutes.js";
 import bookingRoutes from "./routes/bookingRoutes.js";
 import { errorHandler } from "./middleware/errorHandler.js";
+import cors from 'cors';
+
+
 
 dotenv.config();
 connectDB(); // call database connection
 
 const app = express();
+
+app.use(cors({
+    origin: 'http://localhost:5173' 
+}))
 
 app.use(express.json());
 
