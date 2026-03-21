@@ -12,8 +12,18 @@ import {
   ShieldAlert,
   ThermometerSun,
 } from "lucide-react";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/");
+    }
+  }, [navigate]);
   return (
     <div className="flex h-screen bg-gray-50 font-poppins">
       {/* Sidebar */}
