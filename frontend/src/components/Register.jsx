@@ -2,6 +2,8 @@ import { useState } from "react";
 import API from "../api";
 import { useNavigate, Link } from "react-router-dom";
 import { User, Mail, Lock, IdCard, ArrowRight, GraduationCap } from "lucide-react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function Register() {
   const [form, setForm] = useState({
@@ -11,33 +13,81 @@ export default function Register() {
     password: "",
   });
 
+  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
+  // Handle input change
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+    setErrors({ ...errors, [e.target.name]: "" }); // Clear error while typing
   };
 
+  // Validation
+  const validate = () => {
+    const newErrors = {};
+
+    // Full Name
+    if (!form.name.trim()) {
+      newErrors.name = "Name is required";
+    } else if (!/^[a-zA-Z\s]+$/.test(form.name)) {
+      newErrors.name = "Name can only contain letters and spaces";
+    }
+
+    // Student ID: e.g., IT1234567
+    if (!form.studentId.trim()) {
+      newErrors.studentId = "Student ID is required";
+    } else if (!/^[A-Z]{2}\d{7}$/.test(form.studentId)) {
+      newErrors.studentId = "Student ID must be like IT1234567";
+    }
+
+    // Replace the email validation regex in Register.jsx
+    if (!form.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(form.email)) {
+      newErrors.email = "Enter a valid email address";
+    }
+
+    // Password: min 8 chars, 1 number, 1 special char
+    if (!form.password) {
+      newErrors.password = "Password is required";
+    } else if (!/^(?=.*[0-9])(?=.*[!@#$%^&*]).{8,}$/.test(form.password)) {
+      newErrors.password =
+        "Password must be at least 8 characters, include a number and a special character";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  // Handle registration submit
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!validate()) return; // Stop if validation fails
+
     try {
       await API.post("/auth/register", form);
-      alert("Registered successfully!");
-      navigate("/");
+      toast.success("🎉 Registered successfully!");
+
+      // Clear form
+      setForm({ studentId: "", name: "", email: "", password: "" });
+
+      // Redirect to login after 2 seconds
+      setTimeout(() => navigate("/"), 2000);
     } catch (err) {
-      alert(err.response?.data?.message || "Error during registration");
+      toast.error(err.response?.data?.message || "Registration failed!");
     }
   };
 
   return (
     <div className="min-h-screen bg-slate-50 flex font-sans">
-      {/* Left Side: Branding & Visual (Hidden on mobile) */}
+      {/* Left Side Branding */}
       <div className="hidden lg:flex lg:w-1/2 bg-indigo-700 items-center justify-center p-12 relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-full opacity-10">
           <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
             <path d="M0 100 C 20 0 50 0 100 100 Z" fill="white" />
           </svg>
         </div>
-        
         <div className="relative z-10 max-w-md text-white">
           <div className="flex items-center gap-3 mb-8">
             <div className="bg-white p-2 rounded-lg shadow-xl">
@@ -51,21 +101,15 @@ export default function Register() {
           <p className="text-indigo-100 text-lg mb-8">
             Access your courses, grades, and campus resources in one unified, sleek dashboard.
           </p>
-          <div className="flex gap-4 items-center">
-           <div className="flex -space-x-2">
-               
-            </div>
-            {/*<p className="text-sm text-indigo-100 font-medium">Joined by 2,000+ students this semester</p>*/}
-          </div>
         </div>
       </div>
 
-      {/* Right Side: Form */}
+      {/* Right Side Form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 lg:p-16">
         <div className="w-full max-w-md">
           <div className="mb-10 lg:hidden flex items-center gap-2">
-             <GraduationCap className="text-indigo-600 w-6 h-6" />
-             <span className="font-bold text-xl text-slate-900 tracking-tight">Campus Portal</span>
+            <GraduationCap className="text-indigo-600 w-6 h-6" />
+            <span className="font-bold text-xl text-slate-900 tracking-tight">Campus Portal</span>
           </div>
 
           <div className="mb-8">
@@ -82,12 +126,15 @@ export default function Register() {
                 <input
                   name="name"
                   type="text"
-                  required
                   placeholder="Your full name"
+                  value={form.name}
                   onChange={handleChange}
-                  className="w-full pl-11 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none"
+                  className={`w-full pl-11 pr-4 py-2.5 bg-white border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none ${
+                    errors.name ? "border-red-500" : "border-slate-200"
+                  }`}
                 />
               </div>
+              {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
             </div>
 
             {/* Student ID */}
@@ -98,12 +145,15 @@ export default function Register() {
                 <input
                   name="studentId"
                   type="text"
-                  required
                   placeholder="e.g. IT1234567"
+                  value={form.studentId}
                   onChange={handleChange}
-                  className="w-full pl-11 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none"
+                  className={`w-full pl-11 pr-4 py-2.5 bg-white border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none ${
+                    errors.studentId ? "border-red-500" : "border-slate-200"
+                  }`}
                 />
               </div>
+              {errors.studentId && <p className="text-red-500 text-sm mt-1">{errors.studentId}</p>}
             </div>
 
             {/* University Email */}
@@ -114,12 +164,15 @@ export default function Register() {
                 <input
                   name="email"
                   type="email"
-                  required
                   placeholder="name@gmail.com"
+                  value={form.email}
                   onChange={handleChange}
-                  className="w-full pl-11 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none"
+                  className={`w-full pl-11 pr-4 py-2.5 bg-white border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none ${
+                    errors.email ? "border-red-500" : "border-slate-200"
+                  }`}
                 />
               </div>
+              {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
             </div>
 
             {/* Password */}
@@ -130,12 +183,15 @@ export default function Register() {
                 <input
                   name="password"
                   type="password"
-                  required
                   placeholder="••••••••"
+                  value={form.password}
                   onChange={handleChange}
-                  className="w-full pl-11 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none"
+                  className={`w-full pl-11 pr-4 py-2.5 bg-white border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none ${
+                    errors.password ? "border-red-500" : "border-slate-200"
+                  }`}
                 />
               </div>
+              {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
             </div>
 
             <button
@@ -153,6 +209,9 @@ export default function Register() {
               Log in
             </Link>
           </p>
+
+          {/* ToastContainer inside this page */}
+          <ToastContainer position="top-right" autoClose={3000} theme="colored" />
         </div>
       </div>
     </div>
