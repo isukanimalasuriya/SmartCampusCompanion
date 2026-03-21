@@ -5,28 +5,38 @@ import authRoutes from "./routes/authRoutes.js";
 import spaceRoutes from "./routes/spaceRoutes.js";
 import bookingRoutes from "./routes/bookingRoutes.js";
 import { errorHandler } from "./middleware/errorHandler.js";
-import cors from 'cors';
 
-
+import http from "http";
+import { Server } from "socket.io";
 
 dotenv.config();
-connectDB(); // call database connection
+connectDB();
 
 const app = express();
 
-app.use(cors({
-    origin: ['http://localhost:5173', 'http://localhost:5174']
-}))
+// 🔥 CREATE HTTP SERVER (important for socket.io)
+const server = http.createServer(app);
+
+// 🔥 SOCKET.IO SETUP
+export const io = new Server(server, {
+  cors: {
+    origin: "*",
+  },
+});
 
 app.use(express.json());
 
+// ROUTES
 app.use("/api/auth", authRoutes);
 app.use("/api/spaces", spaceRoutes);
 app.use("/api/bookings", bookingRoutes);
+
+// ERROR HANDLER
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
+// 🔥 USE server.listen (NOT app.listen)
+server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
