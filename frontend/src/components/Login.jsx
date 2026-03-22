@@ -25,9 +25,11 @@ export default function Login() {
     const newErrors = {};
 
     if (!form.email.trim()) {
-        newErrors.email = "Email is required";
-    } else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(form.email)) {
-        newErrors.email = "Enter a valid email address";
+      newErrors.email = "Email is required";
+    } else if (
+      !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(form.email)
+    ) {
+      newErrors.email = "Enter a valid email address";
     }
 
     if (!form.password) {
@@ -45,7 +47,7 @@ export default function Login() {
 
     try {
       const res = await API.post("/auth/login", form);
-      toast.success("✅ Login successful!");
+      toast.success("Login successful!");
 
       // Optional: store token or user data
       localStorage.setItem("token", res.data.token);
@@ -62,7 +64,11 @@ export default function Login() {
       {/* Left Side Branding */}
       <div className="hidden lg:flex lg:w-1/2 bg-indigo-700 items-center justify-center p-12 relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-full opacity-10">
-          <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+          <svg
+            className="w-full h-full"
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+          >
             <path d="M0 100 C 20 0 50 0 100 100 Z" fill="white" />
           </svg>
         </div>
@@ -77,7 +83,8 @@ export default function Login() {
             Welcome Back!
           </h2>
           <p className="text-indigo-100 text-lg mb-8">
-            Access your courses, grades, and campus resources in one unified dashboard.
+            Access your courses, grades, and campus resources in one unified
+            dashboard.
           </p>
         </div>
       </div>
@@ -87,18 +94,24 @@ export default function Login() {
         <div className="w-full max-w-md">
           <div className="mb-10 lg:hidden flex items-center gap-2">
             <GraduationCap className="text-indigo-600 w-6 h-6" />
-            <span className="font-bold text-xl text-slate-900 tracking-tight">Campus Portal</span>
+            <span className="font-bold text-xl text-slate-900 tracking-tight">
+              Campus Portal
+            </span>
           </div>
 
           <div className="mb-8">
             <h2 className="text-3xl font-bold text-slate-900 mb-2">Login</h2>
-            <p className="text-slate-500">Enter your credentials to access your account.</p>
+            <p className="text-slate-500">
+              Enter your credentials to access your account.
+            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Email */}
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1.5">University Email</label>
+              <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                University Email
+              </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
                 <input
@@ -112,12 +125,16 @@ export default function Login() {
                   }`}
                 />
               </div>
-              {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+              )}
             </div>
 
             {/* Password */}
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1.5">Password</label>
+              <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                Password
+              </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
                 <input
@@ -131,7 +148,9 @@ export default function Login() {
                   }`}
                 />
               </div>
-              {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+              {errors.password && (
+                <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+              )}
             </div>
 
             <button
@@ -145,13 +164,20 @@ export default function Login() {
 
           <p className="mt-8 text-center text-slate-600 text-sm">
             Don't have an account?{" "}
-            <Link to="/register" className="text-indigo-600 font-bold hover:text-indigo-700">
+            <Link
+              to="/register"
+              className="text-indigo-600 font-bold hover:text-indigo-700"
+            >
               Register
             </Link>
           </p>
 
           {/* ✅ ToastContainer inside this page */}
-          <ToastContainer position="top-right" autoClose={3000} theme="colored" />
+          <ToastContainer
+            position="top-right"
+            autoClose={3000}
+            theme="colored"
+          />
         </div>
       </div>
     </div>

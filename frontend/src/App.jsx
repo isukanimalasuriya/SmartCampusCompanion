@@ -12,10 +12,8 @@ import StudyAreas from "./components/StudyAreas";
 import Profile from "./components/Profile";
 import SupportTicketForm from "./components/SupportTicketForm";
 
-
 function App() {
   return (
-      
     <Routes>
       <Route path="/" element={<Login />} />
       <Route path="/register" element={<Register />} />
@@ -27,9 +25,6 @@ function App() {
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="*" element={<div>Not Found</div>} />
     </Routes>
-
-    
-      
   );
 }
 
