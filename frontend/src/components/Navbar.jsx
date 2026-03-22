@@ -1,8 +1,10 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
-import { Home, User, Settings } from "lucide-react";
+import { NavLink, useNavigate } from "react-router-dom";
+import { Home, User, Settings, LogOut } from "lucide-react";
 
 const Navbar = () => {
+  const navigate = useNavigate();
+
   const linkClass =
     "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium";
 
@@ -10,6 +12,18 @@ const Navbar = () => {
     "bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg";
 
   const inactiveClass = "text-gray-600 hover:bg-gray-100 hover:text-indigo-600";
+
+  //  Logout function
+  const handleLogout = () => {
+    // remove token
+    localStorage.removeItem("token"); // change key if different
+
+    // optional: clear everything
+    localStorage.clear();
+
+    // redirect to login
+    navigate("/");
+  };
 
   return (
     <aside className="h-screen w-64 bg-white shadow-xl p-6 font-poppins flex flex-col">
@@ -60,6 +74,15 @@ const Navbar = () => {
           Settings
         </NavLink>
       </nav>
+
+      {/* Logout Button */}
+      <button
+        onClick={handleLogout}
+        className="mt-6 flex items-center gap-3 px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 transition-all"
+      >
+        <LogOut size={20} />
+        Logout
+      </button>
 
       {/* Bottom Section */}
       <div className="mt-auto text-sm text-gray-400">© 2026 YourApp</div>
