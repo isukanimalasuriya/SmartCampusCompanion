@@ -10,6 +10,7 @@ import Register from "./components/Register";
 import Dashboard from "./components/Dashboard";
 import StudyAreas from "./components/StudyAreas";
 import Profile from "./components/Profile";
+import SupportTicketForm from "./components/SupportTicketForm";
 
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="studyareas" element={<StudyAreas />}></Route>
       <Route path="/profile" element={<Profile />} />
+      <Route path="/support-ticket" element={<SupportTicketForm />} />
 
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="*" element={<div>Not Found</div>} />

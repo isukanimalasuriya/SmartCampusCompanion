@@ -1,16 +1,22 @@
-import express from "express";
 import dotenv from "dotenv";
+dotenv.config({ path: "./.env" });
+import express from "express";
+
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import spaceRoutes from "./routes/spaceRoutes.js";
 import bookingRoutes from "./routes/bookingRoutes.js";
+import ticketRoutes from "./routes/ticketRoutes.js";
 import { errorHandler } from "./middleware/errorHandler.js";
+import aiRoutes from "./routes/aiRoutes.js";
 
 import http from "http";
 import { Server } from "socket.io";
 import cors from "cors";
 
-dotenv.config();
+
+console.log("OPENAI_KEY:", process.env.OPENAI_API_KEY);
+//dotenv.config();
 connectDB();
 
 const app = express();
@@ -37,6 +43,8 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/spaces", spaceRoutes);
 app.use("/api/bookings", bookingRoutes);
+app.use("/api/tickets", ticketRoutes);
+app.use("/api/ai", aiRoutes);
 
 // ERROR HANDLER
 app.use(errorHandler);
