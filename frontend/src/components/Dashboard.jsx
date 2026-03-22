@@ -18,12 +18,6 @@ import { useNavigate } from "react-router-dom";
 const Dashboard = () => {
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      navigate("/");
-    }
-  }, [navigate]);
   return (
     <div className="flex h-screen bg-gray-50 font-poppins">
       {/* Sidebar */}
@@ -98,7 +92,10 @@ const Dashboard = () => {
                 <button className="px-4 py-2 rounded-xl bg-white text-indigo-700 font-medium text-sm hover:bg-white/90 transition">
                   Navigate
                 </button>
-                <button className="px-4 py-2 rounded-xl bg-white/10 border border-white/20 text-white font-medium text-sm hover:bg-white/15 transition">
+                <button
+                  onClick={() => navigate("/support-ticket")}
+                  className="px-4 py-2 rounded-xl bg-white/10 border border-white/20 text-white font-medium text-sm hover:bg-white/15 transition"
+                >
                   Report Issue
                 </button>
               </div>

@@ -24,7 +24,7 @@ export default function Profile() {
         const res = await API.get("/auth/profile", {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setStudent(res.data);
+        setStudent(res.data.user || res.data);
       } catch (err) {
         toast.error("Failed to fetch profile");
         navigate("/");
