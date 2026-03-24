@@ -1,87 +1,92 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
-const groupSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    course: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    topic: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    description: {
-        type: String,
-        default: ''
+const groupSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true, trim: true },
+    course: { type: String, required: true, trim: true },
+    topic: { type: String, required: true, trim: true },
+    description: { type: String, default: "" },
+    category: {
+      type: String,
+      enum: [
+        "General Discussion",
+        "Exams",
+        "Mid Exam",
+        "Final Exam",
+        "Lab Test",
+        "Viva",
+        "Research",
+        "Assignment Help",
+        "Project Collaboration",
+      ],
+      default: "General Discussion",
     },
     creator: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
-    isPublic: {
-        type: Boolean,
-        default: true
+    creatorRole: {
+      type: String,
+      enum: ["admin", "moderator"],
+      default: "admin",
     },
-    inviteCode: {
-        type: String,
-        unique: true,
-        required: true
-    },
-    meetingOptions: {
-        type: {
-            platform: {
-                type: String,
-                enum: ['zoom', 'google-meet', 'teams', 'other'],
-                default: 'google-meet'
-            },
-            link: String,
-            schedule: {
-                day: String,
-                time: String,
-                frequency: {
-                    type: String,
-                    enum: ['once', 'daily', 'weekly'],
-                    default: 'weekly'
-                }
-            }
+    maxMembers: { type: Number, default: 50, min: 2, max: 200 },
+    isPublic: { type: Boolean, default: true },
+    inviteCode: { type: String, unique: true, sparse: true },
+    members: [
+      {
+        user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        role: {
+          type: String,
+          enum: ["admin", "moderator", "member"],
+          default: "member",
         },
-        default: {}
-    },
-    members: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
-    }],
-    status: {
-        type: String,
-        enum: ['active', 'archived'],
-        default: 'active'
-    }
-}, {
-    timestamps: true
-});
+        joinedAt: { type: Date, default: Date.now },
+      },
+    ],
+    status: { type: String, enum: ["active", "archived"], default: "active" },
+  },
+  { timestamps: true }
+);
 
-// Generate unique invite code before saving
-groupSchema.pre('save', async function(next) {
-    if (!this.inviteCode) {
-        this.inviteCode = this.generateInviteCode();
-    }
-    next();
-});
-
-groupSchema.methods.generateInviteCode = function() {
-    const characters = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    let code = '';
+// ✅ Use async instead of next() callback — avoids the "next is not a function" error
+groupSchema.pre("save", async function () {
+  if (!this.inviteCode && this.isNew) {
+    const characters = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    let code = "";
     for (let i = 0; i < 8; i++) {
-        code += characters.charAt(Math.floor(Math.random() * characters.length));
+      code += characters.charAt(Math.floor(Math.random() * characters.length));
     }
-    return code;
+    this.inviteCode = code;
+  }
+});
+
+groupSchema.methods.generateInviteCode = function () {
+  const characters = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let code = "";
+  for (let i = 0; i < 8; i++) {
+    code += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return code;
 };
 
-module.exports = mongoose.model('Group', groupSchema);
+groupSchema.methods.isFull = function () {
+  return this.members.length >= this.maxMembers;
+};
+
+groupSchema.methods.addMember = function (userId, role = "member") {
+  if (this.isFull()) {
+    throw new Error("Group has reached maximum member limit");
+  }
+  const existingMember = this.members.find(
+    (member) => member.user.toString() === userId.toString()
+  );
+  if (existingMember) {
+    throw new Error("User is already a member of this group");
+  }
+  this.members.push({ user: userId, role, joinedAt: new Date() });
+};
+
+const Group = mongoose.model("Group", groupSchema);
+export default Group;

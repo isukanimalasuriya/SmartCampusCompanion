@@ -10,6 +10,7 @@ import Register from "./components/Register";
 import Dashboard from "./components/Dashboard";
 import StudyAreas from "./components/StudyAreas";
 import Profile from "./components/Profile";
+import Community from "./components/community/Community";
 
 function App() {
   return (
@@ -19,6 +20,8 @@ function App() {
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="studyareas" element={<StudyAreas />}></Route>
       <Route path="/profile" element={<Profile />} />
+      <Route path="/community" element={<Community />} />
+  
 
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="*" element={<div>Not Found</div>} />
