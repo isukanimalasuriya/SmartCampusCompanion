@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { Home, User, Settings } from "lucide-react";
+import { Home, User, Settings, BookOpen } from "lucide-react";
 
 const Navbar = () => {
   const linkClass =
@@ -36,8 +36,18 @@ const Navbar = () => {
             `${linkClass} ${isActive ? activeClass : inactiveClass}`
           }
         >
-          <User size={20} />
+          <BookOpen size={20} />
           Study Areas
+        </NavLink>
+
+        <NavLink
+          to="/skill-exchange"
+          className={({ isActive }) =>
+            `${linkClass} ${isActive ? activeClass : inactiveClass}`
+          }
+        >
+          <BookOpen size={20} />
+          Skill Exchange
         </NavLink>
 
         <NavLink

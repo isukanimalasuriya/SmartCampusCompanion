@@ -12,8 +12,10 @@ import {
   ShieldAlert,
   ThermometerSun,
 } from "lucide-react";
+import { useUser } from "../context/UserContext";
 
 const Dashboard = () => {
+  const { user } = useUser();
   return (
     <div className="flex h-screen bg-gray-50 font-poppins">
       {/* Sidebar */}
@@ -51,11 +53,11 @@ const Dashboard = () => {
 
               <div className="flex items-center gap-3 pl-3 border-l border-gray-200">
                 <div className="hidden sm:block text-right leading-tight">
-                  <p className="text-sm font-semibold text-gray-900">Student</p>
+                  <p className="text-sm font-semibold text-gray-900">{user.name}</p>
                   <p className="text-xs text-gray-500">Campus Mode</p>
                 </div>
                 <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 text-white flex items-center justify-center font-semibold shadow">
-                  SC
+                  {user.avatar}
                 </div>
               </div>
             </div>

@@ -7,12 +7,14 @@ import Navbar from "./components/Navbar";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Dashboard from "./components/Dashboard";
 import StudyAreas from "./components/StudyAreas";
+import SkillExchange from "./components/SkillExchange/SkillExchange";
 
 function App() {
   return (
     <Routes>
       <Route path="/dashboard" element={<Dashboard />}></Route>
       <Route path="studyareas" element={<StudyAreas />}></Route>
+      <Route path="skill-exchange" element={<SkillExchange />}></Route>
 
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="*" element={<div>Not Found</div>} />

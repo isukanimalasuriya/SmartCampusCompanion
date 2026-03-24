@@ -4,18 +4,22 @@ import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import spaceRoutes from "./routes/spaceRoutes.js";
 import bookingRoutes from "./routes/bookingRoutes.js";
+import skillRoutes from "./routes/skillRoutes.js";
 import { errorHandler } from "./middleware/errorHandler.js";
+import cors from "cors";
 
 dotenv.config();
 connectDB(); // call database connection
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/spaces", spaceRoutes);
 app.use("/api/bookings", bookingRoutes);
+app.use("/api/skills", skillRoutes);
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
