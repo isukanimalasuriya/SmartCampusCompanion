@@ -12,10 +12,12 @@ import {
   ShieldAlert,
   ThermometerSun,
 } from "lucide-react";
-import { useUser } from "../context/UserContext";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
-  const { user } = useUser();
+  const navigate = useNavigate();
+
   return (
     <div className="flex h-screen bg-gray-50 font-poppins">
       {/* Sidebar */}
@@ -51,6 +53,12 @@ const Dashboard = () => {
                 <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-red-500" />
               </button>
 
+              {/* Profile button */}
+              <button
+                onClick={() => navigate("/profile")}
+                className="flex items-center gap-2 pl-3 border-l border-gray-200"
+              ></button>
+
               <div className="flex items-center gap-3 pl-3 border-l border-gray-200">
                 <div className="hidden sm:block text-right leading-tight">
                   <p className="text-sm font-semibold text-gray-900">{user.name}</p>
@@ -70,7 +78,7 @@ const Dashboard = () => {
           <section className="rounded-3xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-6 md:p-8 shadow-lg">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
               <div>
-                <p className="text-white/80 text-sm">Good morning 👋</p>
+                <p className="text-white/80 text-sm">Good morning !</p>
                 <h2 className="text-2xl md:text-3xl font-semibold mt-1">
                   Everything you need, right on campus.
                 </h2>
@@ -84,7 +92,10 @@ const Dashboard = () => {
                 <button className="px-4 py-2 rounded-xl bg-white text-indigo-700 font-medium text-sm hover:bg-white/90 transition">
                   Navigate
                 </button>
-                <button className="px-4 py-2 rounded-xl bg-white/10 border border-white/20 text-white font-medium text-sm hover:bg-white/15 transition">
+                <button
+                  onClick={() => navigate("/support-ticket")}
+                  className="px-4 py-2 rounded-xl bg-white/10 border border-white/20 text-white font-medium text-sm hover:bg-white/15 transition"
+                >
                   Report Issue
                 </button>
               </div>
