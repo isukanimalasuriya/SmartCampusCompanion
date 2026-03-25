@@ -9,11 +9,10 @@ import spaceRoutes from "./routes/spaceRoutes.js";
 import bookingRoutes from "./routes/bookingRoutes.js";
 import ticketRoutes from "./routes/ticketRoutes.js";
 import { errorHandler } from "./middleware/errorHandler.js";
-<<<<<<< HEAD
+
 import aiRoutes from "./routes/aiRoutes.js";
 
-=======
->>>>>>> kamindu
+
 import http from "http";
 import { Server } from "socket.io";
 import cors from "cors";
@@ -52,12 +51,12 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/spaces", spaceRoutes);
 app.use("/api/bookings", bookingRoutes);
-<<<<<<< HEAD
+
 app.use("/api/tickets", ticketRoutes);
 app.use("/api/ai", aiRoutes);
-=======
+
 app.use("/api/groups", groupRoutes); // Your group routes
->>>>>>> kamindu
+
 
 // Error handler (should be last)
 app.use(errorHandler);
