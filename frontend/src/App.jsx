@@ -11,6 +11,7 @@ import Dashboard from "./components/Dashboard";
 import StudyAreas from "./components/StudyAreas";
 import Profile from "./components/Profile";
 import SupportTicketForm from "./components/SupportTicketForm";
+import MyTickets from "./components/MyTickets";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
       <Route path="studyareas" element={<StudyAreas />}></Route>
       <Route path="/dashboard/profile" element={<Profile />} />
       <Route path="/support-ticket" element={<SupportTicketForm />} />
+      <Route path="/my-tickets" element={<MyTickets />} />
 
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="*" element={<div>Not Found</div>} />

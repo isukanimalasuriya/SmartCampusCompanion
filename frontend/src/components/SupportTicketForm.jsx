@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // Added for navigation
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -12,6 +13,8 @@ const categories = [
 ];
 
 const SupportTicketForm = () => {
+  const navigate = useNavigate(); // <-- Initialize navigation
+
   const [formData, setFormData] = useState({
     studentName: "",
     phoneNumber: "",
@@ -71,8 +74,18 @@ const SupportTicketForm = () => {
       toast.error("Please fix all fields before submitting");
       return;
     }
+
     try {
-      await axios.post("http://localhost:5000/api/tickets", formData);
+      const token = localStorage.getItem("token"); // <-- Get JWT token
+      if (!token) {
+        toast.error("You must be logged in!");
+        return;
+      }
+
+      await axios.post("http://localhost:5000/api/tickets", formData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
       toast.success("Ticket submitted successfully!");
       setFormData({
         studentName: "",
@@ -82,9 +95,12 @@ const SupportTicketForm = () => {
       });
       setErrors({ studentName: true, phoneNumber: true, description: true });
       setSuggestions([]);
+
+      // Automatically navigate to My Tickets page
+      setTimeout(() => navigate("/my-tickets"), 1000);
     } catch (err) {
       console.error(err);
-      toast.error("Failed to submit ticket.");
+      toast.error(err.response?.data?.message || "Failed to submit ticket.");
     }
   };
 
@@ -102,8 +118,10 @@ const SupportTicketForm = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-10"
-         style={{ background: "linear-gradient(to bottom, #e0f7fa, #f9f9f9)" }}>
+    <div
+      className="min-h-screen flex items-center justify-center p-10"
+      style={{ background: "linear-gradient(to bottom, #e0f7fa, #f9f9f9)" }}
+    >
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6 w-full max-w-4xl">
 
         {/* LEFT — FORM */}
@@ -210,9 +228,19 @@ const SupportTicketForm = () => {
             >
               Submit Ticket →
             </button>
+
+            {/* New "View My Tickets" button */}
+            <button
+              type="button"
+              onClick={() => navigate("/my-tickets")}
+              className="mt-4 w-full text-indigo-600 border border-indigo-600 py-3 rounded-xl hover:bg-indigo-50 transition"
+            >
+              View My Tickets
+            </button>
           </form>
         </div>
 
+        {/* RIGHT — AI Suggestions */}
         <div className="bg-white rounded-2xl p-8 shadow-sm flex flex-col">
           <div className="flex items-center gap-3 mb-8">
             <div className="w-11 h-11 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl flex items-center justify-center text-white font-bold text-xl">
@@ -220,7 +248,6 @@ const SupportTicketForm = () => {
             </div>
             <div>
               <h2 className="text-base font-bold text-gray-900">AI Quick Help</h2>
-              
             </div>
           </div>
 
