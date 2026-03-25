@@ -50,7 +50,7 @@ const Navbar = () => {
             `${linkClass} ${isActive ? activeClass : inactiveClass}`
           }
         >
-          <User size={20} />
+          <BookOpen size={20} />
           Study Areas
         </NavLink>
 
@@ -66,6 +66,17 @@ const Navbar = () => {
         </NavLink>
 
         <NavLink
+          to="/skill-exchange"
+          className={({ isActive }) =>
+            `${linkClass} ${isActive ? activeClass : inactiveClass}`
+          }
+        >
+          <BookOpen size={20} />
+          Skill Exchange
+        </NavLink>
+
+        <NavLink
+          to="profile"
           to="/profile"
           className={({ isActive }) =>
             `${linkClass} ${isActive ? activeClass : inactiveClass}`

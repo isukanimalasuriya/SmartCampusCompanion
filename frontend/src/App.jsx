@@ -9,6 +9,7 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import Dashboard from "./components/Dashboard";
 import StudyAreas from "./components/StudyAreas";
+import SkillExchange from "./components/SkillExchange/SkillExchange";
 import Profile from "./components/Profile";
 
 import SupportTicketForm from "./components/SupportTicketForm";
@@ -24,6 +25,7 @@ function App() {
       <Route path="/register" element={<Register />} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="studyareas" element={<StudyAreas />}></Route>
+      <Route path="skill-exchange" element={<SkillExchange />}></Route>
 
       <Route path="/dashboard/profile" element={<Profile />} />
       <Route path="/support-ticket" element={<SupportTicketForm />} />
