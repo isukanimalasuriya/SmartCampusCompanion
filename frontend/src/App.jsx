@@ -11,6 +11,7 @@ import Dashboard from "./components/Dashboard";
 import StudyAreas from "./components/StudyAreas";
 import Profile from "./components/Profile";
 import Community from "./components/community/Community";
+import GroupDetail from "./components/community/GroupDetail";
 
 function App() {
   return (
@@ -21,7 +22,7 @@ function App() {
       <Route path="studyareas" element={<StudyAreas />}></Route>
       <Route path="/profile" element={<Profile />} />
       <Route path="/community" element={<Community />} />
-  
+      <Route path="/community/:id" element={<GroupDetail />} />
 
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="*" element={<div>Not Found</div>} />
