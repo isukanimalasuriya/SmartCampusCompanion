@@ -556,7 +556,7 @@ const GroupDetail = () => {
                   {messages.length === 0 && (
                     <div className="text-center py-16 text-gray-400">
                       <MessageSquare size={40} className="mx-auto mb-3 opacity-30" />
-                      <p className="text-sm">No messages yet. Say hello! 👋</p>
+                      <p className="text-sm">No messages yet. Say hello! </p>
                     </div>
                   )}
                   {messages.map((msg) => {

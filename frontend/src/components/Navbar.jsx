@@ -96,7 +96,7 @@ const Navbar = () => {
       </button>
 
       {/* Bottom Section */}
-      <div className="mt-auto text-sm text-gray-400">© 2026 CampusCompanion</div>
+      <div className="mt-auto text-sm text-gray-400">© 2026 YourApp</div>
     </aside>
   );
 };
