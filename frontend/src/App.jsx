@@ -10,7 +10,12 @@ import Register from "./components/Register";
 import Dashboard from "./components/Dashboard";
 import StudyAreas from "./components/StudyAreas";
 import Profile from "./components/Profile";
+<<<<<<< HEAD
 import SupportTicketForm from "./components/SupportTicketForm";
+=======
+import Community from "./components/community/Community";
+import GroupDetail from "./components/community/GroupDetail";
+>>>>>>> kamindu
 
 function App() {
   return (
@@ -19,8 +24,14 @@ function App() {
       <Route path="/register" element={<Register />} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="studyareas" element={<StudyAreas />}></Route>
+<<<<<<< HEAD
       <Route path="/dashboard/profile" element={<Profile />} />
       <Route path="/support-ticket" element={<SupportTicketForm />} />
+=======
+      <Route path="/profile" element={<Profile />} />
+      <Route path="/community" element={<Community />} />
+      <Route path="/community/:id" element={<GroupDetail />} />
+>>>>>>> kamindu
 
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="*" element={<div>Not Found</div>} />
