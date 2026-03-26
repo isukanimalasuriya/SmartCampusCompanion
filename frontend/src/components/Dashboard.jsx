@@ -1,42 +1,40 @@
 import React from "react";
 import Navbar from "./Navbar";
-import { Outlet } from "react-router-dom";
-import {
-  Search,
-  Bell,
-  MapPin,
-  Wifi,
-  Bus,
-  BookOpen,
-  CalendarCheck,
-  ShieldAlert,
-  ThermometerSun,
-} from "lucide-react";
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
+import { Search, Bell, MapPin, Wifi, Bus, BookOpen, CalendarCheck, ShieldAlert, ThermometerSun } from "lucide-react";
 import { useUser } from "../context/UserContext";
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { user } = useUser();
+  const { user, loading } = useUser();
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p>Loading user info…</p>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p>User not found. Please login.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen bg-gray-50 font-poppins">
-      {/* Sidebar */}
       <Navbar />
 
-      {/* Main */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Topbar */}
         <header className="sticky top-0 z-20 bg-white/80 backdrop-blur border-b border-gray-200">
           <div className="px-6 py-4 flex items-center justify-between gap-4">
             <div className="min-w-[180px]">
-              <h1 className="text-xl font-semibold text-gray-900">
-                Smart Campus Companion
-              </h1>
-              <p className="text-sm text-gray-500">
-                Live campus info • Alerts • Navigation
-              </p>
+              <h1 className="text-xl font-semibold text-gray-900">Smart Campus Companion</h1>
+              <p className="text-sm text-gray-500">Live campus info • Alerts • Navigation</p>
             </div>
 
             {/* Search */}
@@ -59,9 +57,7 @@ const Dashboard = () => {
               <button
                 onClick={() => navigate("/profile")}
                 className="flex items-center gap-2 pl-3 border-l border-gray-200"
-              ></button>
-
-              <div className="flex items-center gap-3 pl-3 border-l border-gray-200">
+              >
                 <div className="hidden sm:block text-right leading-tight">
                   <p className="text-sm font-semibold text-gray-900">{user.name}</p>
                   <p className="text-xs text-gray-500">Campus Mode</p>
@@ -69,7 +65,7 @@ const Dashboard = () => {
                 <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 text-white flex items-center justify-center font-semibold shadow">
                   {user.avatar}
                 </div>
-              </div>
+              </button>
             </div>
           </div>
         </header>
