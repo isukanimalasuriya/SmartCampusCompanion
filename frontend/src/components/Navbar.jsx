@@ -101,7 +101,7 @@ const Navbar = () => {
         </NavLink>
 
         <NavLink
-          to="profile"
+          to="/profile"
           
           className={({ isActive }) =>
             `${linkClass} ${isActive ? activeClass : inactiveClass}`
