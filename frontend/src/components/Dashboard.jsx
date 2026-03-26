@@ -14,9 +14,11 @@ import {
 } from "lucide-react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useUser } from "../context/UserContext";
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const { user } = useUser();
 
   return (
     <div className="flex h-screen bg-gray-50 font-poppins">

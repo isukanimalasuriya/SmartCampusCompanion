@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { Home, User, Settings, LogOut, Users } from "lucide-react";
+import { Home, User, Settings, LogOut, Users, BookOpen } from "lucide-react";
 import API from "../api";
 
 const Navbar = () => {
@@ -102,7 +102,7 @@ const Navbar = () => {
 
         <NavLink
           to="profile"
-          to="/profile"
+          
           className={({ isActive }) =>
             `${linkClass} ${isActive ? activeClass : inactiveClass}`
           }

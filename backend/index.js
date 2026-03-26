@@ -17,7 +17,7 @@ import aiRoutes from "./routes/aiRoutes.js";
 
 import http from "http";
 import { Server } from "socket.io";
-import cors from "cors";
+
 
 
 console.log("OPENAI_KEY:", process.env.OPENAI_API_KEY);
