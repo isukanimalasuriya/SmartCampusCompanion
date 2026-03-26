@@ -54,7 +54,7 @@ const Navbar = () => {
     <aside className="h-screen w-64 bg-white shadow-xl p-6 font-poppins flex flex-col">
       
       {/* Logo */}
-      <div className="text-2xl font-semibold text-indigo-600 mb-10">
+      <div className="text-xl font-bold text-indigo-600 mb-10 whitespace-nowrap tracking-tight">
         CampusCompanion
       </div>
 
