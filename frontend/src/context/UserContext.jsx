@@ -1,19 +1,49 @@
-import React, { createContext, useContext, useState } from "react";
+// context/UserContext.jsx
+import { createContext, useContext, useState, useEffect } from "react";
+import API from "../api";
 
 const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
-  // Mock current user - In a real app, this would come from an Auth API
-  const [user] = useState({
-    id: "user_67890",
-    name: "John Doe",
-    email: "john.doe@my.sliit.lk",
-    avatar: "JD",
-    role: "student"
-  });
+  const [user, setUser] = useState(null); // start with null
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const res = await API.get("/auth/profile", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const userData = res.data.user || res.data;
+
+        // create avatar initials
+        const initials = userData.name
+          .split(" ")
+          .map((n) => n[0])
+          .join("")
+          .toUpperCase()
+          .slice(0, 2);
+
+        setUser({ ...userData, avatar: initials });
+      } catch (err) {
+        console.error("Failed to fetch user:", err);
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, []);
 
   return (
-    <UserContext.Provider value={{ user }}>
+    <UserContext.Provider value={{ user, loading }}>
       {children}
     </UserContext.Provider>
   );
