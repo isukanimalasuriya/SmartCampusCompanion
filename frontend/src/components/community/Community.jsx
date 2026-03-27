@@ -21,7 +21,10 @@ const Community = () => {
   const token = localStorage.getItem("token");
 
   useEffect(() => {
-    if (!token) { navigate("/"); return; }
+    if (!token) {
+      navigate("/");
+      return;
+    }
     fetchGroups();
   }, []);
 
@@ -48,20 +51,20 @@ const Community = () => {
   // Calculate stats
   const totalMyGroups = myGroups.length;
   const totalPublicGroups = groups.length;
-  const totalPrivateGroupsUserIsIn = myGroups.filter(g => !g.isPublic).length;
+  const totalPrivateGroupsUserIsIn = myGroups.filter((g) => !g.isPublic).length;
 
   const filteredMyGroups = myGroups.filter((g) =>
     [g.name, g.course, g.topic].some((f) =>
-      f?.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+      f?.toLowerCase().includes(searchTerm.toLowerCase()),
+    ),
   );
 
   const filteredPublicGroups = groups.filter(
     (g) =>
       !myGroups.some((mg) => mg._id === g._id) &&
       [g.name, g.course, g.topic].some((f) =>
-        f?.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+        f?.toLowerCase().includes(searchTerm.toLowerCase()),
+      ),
   );
 
   if (loading) {
@@ -76,7 +79,7 @@ const Community = () => {
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="font-poppins flex min-h-screen bg-gray-50">
       <Navbar />
       <main className="flex-1 p-6 overflow-y-auto">
         <div className="max-w-7xl mx-auto space-y-6">
@@ -84,10 +87,15 @@ const Community = () => {
           <section className="rounded-3xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-6 md:p-8 shadow-lg">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
               <div>
-                <p className="text-white/70 text-sm font-medium tracking-wide uppercase">Connect & Collaborate</p>
-                <h2 className="text-2xl md:text-3xl font-bold mt-1">Study Groups</h2>
+                <p className="text-white/70 text-sm font-medium tracking-wide uppercase">
+                  Connect & Collaborate
+                </p>
+                <h2 className="text-2xl md:text-3xl font-bold mt-1">
+                  Study Groups
+                </h2>
                 <p className="text-white/70 mt-2 text-sm max-w-xl">
-                  Create or join study groups, share resources, and learn together.
+                  Create or join study groups, share resources, and learn
+                  together.
                 </p>
               </div>
               <div className="flex gap-3 flex-wrap">
@@ -124,7 +132,9 @@ const Community = () => {
                 <span className="text-sm text-white/75 flex items-center gap-2">
                   <Lock size={15} /> Private Groups
                 </span>
-                <span className="font-bold text-lg">{totalPrivateGroupsUserIsIn}</span>
+                <span className="font-bold text-lg">
+                  {totalPrivateGroupsUserIsIn}
+                </span>
               </div>
             </div>
           </section>
@@ -144,8 +154,14 @@ const Community = () => {
               </div>
               <div className="flex gap-1 bg-gray-100 p-1 rounded-xl">
                 {[
-                  { key: "my", label: `My Groups (${filteredMyGroups.length})` },
-                  { key: "discover", label: `Discover (${filteredPublicGroups.length})` },
+                  {
+                    key: "my",
+                    label: `My Groups (${filteredMyGroups.length})`,
+                  },
+                  {
+                    key: "discover",
+                    label: `Discover (${filteredPublicGroups.length})`,
+                  },
                 ].map(({ key, label }) => (
                   <button
                     key={key}
@@ -166,7 +182,12 @@ const Community = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
               {activeTab === "my" &&
                 filteredMyGroups.map((g) => (
-                  <GroupCard key={g._id} group={g} onClick={() => handleGroupClick(g._id)} showJoinButton={false} />
+                  <GroupCard
+                    key={g._id}
+                    group={g}
+                    onClick={() => handleGroupClick(g._id)}
+                    showJoinButton={false}
+                  />
                 ))}
               {activeTab === "discover" &&
                 filteredPublicGroups.map((g) => (
@@ -187,7 +208,9 @@ const Community = () => {
                   <Users size={28} className="text-indigo-400" />
                 </div>
                 <p className="text-gray-700 font-semibold">No groups yet</p>
-                <p className="text-gray-400 text-sm mt-1">Create your first group or join with an invite code</p>
+                <p className="text-gray-400 text-sm mt-1">
+                  Create your first group or join with an invite code
+                </p>
                 <button
                   onClick={() => setShowCreateModal(true)}
                   className="mt-4 px-5 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition text-sm font-medium cursor-pointer"
@@ -202,10 +225,14 @@ const Community = () => {
                   <Search size={28} className="text-purple-400" />
                 </div>
                 <p className="text-gray-700 font-semibold">
-                  {searchTerm ? `No results for "${searchTerm}"` : "No public groups available"}
+                  {searchTerm
+                    ? `No results for "${searchTerm}"`
+                    : "No public groups available"}
                 </p>
                 <p className="text-gray-400 text-sm mt-1">
-                  {searchTerm ? "Try a different search term" : "Check back later for new groups!"}
+                  {searchTerm
+                    ? "Try a different search term"
+                    : "Check back later for new groups!"}
                 </p>
               </div>
             )}
@@ -214,10 +241,22 @@ const Community = () => {
       </main>
 
       {showCreateModal && (
-        <CreateGroupModal onClose={() => setShowCreateModal(false)} onSuccess={() => { fetchGroups(); setShowCreateModal(false); }} />
+        <CreateGroupModal
+          onClose={() => setShowCreateModal(false)}
+          onSuccess={() => {
+            fetchGroups();
+            setShowCreateModal(false);
+          }}
+        />
       )}
       {showJoinModal && (
-        <JoinGroupModal onClose={() => setShowJoinModal(false)} onSuccess={() => { fetchGroups(); setShowJoinModal(false); }} />
+        <JoinGroupModal
+          onClose={() => setShowJoinModal(false)}
+          onSuccess={() => {
+            fetchGroups();
+            setShowJoinModal(false);
+          }}
+        />
       )}
     </div>
   );
