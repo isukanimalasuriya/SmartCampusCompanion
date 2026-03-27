@@ -5,7 +5,6 @@ import { User, Mail, IdCard, GraduationCap, LogOut } from "lucide-react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-
 export default function Profile() {
   const [student, setStudent] = useState(null);
   const navigate = useNavigate();
