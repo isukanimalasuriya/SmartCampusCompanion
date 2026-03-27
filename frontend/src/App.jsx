@@ -9,9 +9,11 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import Dashboard from "./components/Dashboard";
 import StudyAreas from "./components/StudyAreas";
+import SkillExchange from "./components/SkillExchange/SkillExchange";
 import Profile from "./components/Profile";
 
 import SupportTicketForm from "./components/SupportTicketForm";
+import MyTickets from "./components/MyTickets";
 
 import Community from "./components/community/Community";
 import GroupDetail from "./components/community/GroupDetail";
@@ -24,11 +26,13 @@ function App() {
       <Route path="/register" element={<Register />} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="studyareas" element={<StudyAreas />}></Route>
+      <Route path="skill-exchange" element={<SkillExchange />}></Route>
 
-      <Route path="/dashboard/profile" element={<Profile />} />
+      {/* <Route path="/dashboard/profile" element={<Profile />} /> */}
       <Route path="/support-ticket" element={<SupportTicketForm />} />
+      <Route path="/my-tickets" element={<MyTickets />} />
 
-      <Route path="/profile" element={<Profile />} />
+      <Route path="profile" element={<Profile />} />
       <Route path="/community" element={<Community />} />
       <Route path="/community/:id" element={<GroupDetail />} />
 

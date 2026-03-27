@@ -7,15 +7,17 @@ import groupRoutes from "./routes/groupRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import spaceRoutes from "./routes/spaceRoutes.js";
 import bookingRoutes from "./routes/bookingRoutes.js";
+import skillRoutes from "./routes/skillRoutes.js";
 import ticketRoutes from "./routes/ticketRoutes.js";
 import { errorHandler } from "./middleware/errorHandler.js";
+import cors from "cors";
 
 import aiRoutes from "./routes/aiRoutes.js";
 
 
 import http from "http";
 import { Server } from "socket.io";
-import cors from "cors";
+
 
 
 console.log("OPENAI_KEY:", process.env.OPENAI_API_KEY);
@@ -24,6 +26,7 @@ connectDB();
 
 const app = express();
 
+app.use(cors());
 // CREATE HTTP SERVER (important for socket.io)
 const server = http.createServer(app);
 
@@ -51,6 +54,7 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/spaces", spaceRoutes);
 app.use("/api/bookings", bookingRoutes);
+app.use("/api/skills", skillRoutes);
 
 app.use("/api/tickets", ticketRoutes);
 app.use("/api/ai", aiRoutes);
