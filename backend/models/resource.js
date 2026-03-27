@@ -1,4 +1,3 @@
-// backend/models/resource.js
 import mongoose from "mongoose";
 
 const resourceSchema = new mongoose.Schema(
@@ -22,6 +21,20 @@ const resourceSchema = new mongoose.Schema(
     },
     url: { type: String, default: "" },
     content: { type: String, default: "" },
+    // S3 file fields (when shared from chat)
+    fileKey: { type: String, default: null },
+    mimeType: { type: String, default: null },
+    fileType: {
+      type: String,
+      enum: ["image", "video", "audio", "document", "other", null],
+      default: null,
+    },
+    size: { type: Number, default: null },
+    sourceMessage: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Message",
+      default: null,
+    },
   },
   { timestamps: true }
 );
