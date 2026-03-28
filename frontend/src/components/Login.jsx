@@ -5,6 +5,9 @@ import { Mail, Lock, ArrowRight, GraduationCap } from "lucide-react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+// ✅ NEW: import user context
+import { useUser } from "../context/UserContext";
+
 export default function Login() {
   const [form, setForm] = useState({
     email: "",
@@ -14,10 +17,13 @@ export default function Login() {
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
+  // ✅ NEW: get setUser from context
+  const { setUser } = useUser();
+
   // Handle input change
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
-    setErrors({ ...errors, [e.target.name]: "" }); // Clear field error
+    setErrors({ ...errors, [e.target.name]: "" });
   };
 
   // Validation
@@ -45,17 +51,46 @@ export default function Login() {
     e.preventDefault();
     if (!validate()) return;
 
+    // ✅ NEW: show loading toast immediately
+    const loadingToast = toast.loading("Logging in...");
+
     try {
       const res = await API.post("/auth/login", form);
-      toast.success("Login successful!");
 
-      // Optional: store token or user data
+      // ✅ Update toast to success
+      toast.update(loadingToast, {
+        render: "Login successful!",
+        type: "success",
+        isLoading: false,
+        autoClose: 3000,
+        theme: "colored",
+      });
+
+      // ✅ Save token
       localStorage.setItem("token", res.data.token);
 
-      // Redirect to dashboard
-      setTimeout(() => navigate("/dashboard"), 1500);
+      // ✅ Set user in context immediately
+      const userData = res.data.user;
+      const initials = userData.name
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2);
+
+      setUser({ ...userData, avatar: initials }); // ✅ NEW
+
+      // ✅ Navigate to dashboard
+      navigate("/dashboard"); // ✅ CHANGED
     } catch (err) {
-      toast.error(err.response?.data?.message || "Login failed!");
+      // ✅ Update toast to error
+      toast.update(loadingToast, {
+        render: err.response?.data?.message || "Login failed!",
+        type: "error",
+        isLoading: false,
+        autoClose: 3000,
+        theme: "colored",
+      });
     }
   };
 
@@ -77,7 +112,9 @@ export default function Login() {
             <div className="bg-white p-2 rounded-lg shadow-xl">
               <GraduationCap className="text-indigo-700 w-8 h-8" />
             </div>
-            <h1 className="text-3xl font-bold tracking-tight">Campus Portal</h1>
+            <h1 className="text-3xl font-bold tracking-tight">
+              Campus Portal
+            </h1>
           </div>
           <h2 className="text-5xl font-extrabold mb-6 leading-tight">
             Welcome Back!
@@ -149,7 +186,9 @@ export default function Login() {
                 />
               </div>
               {errors.password && (
-                <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.password}
+                </p>
               )}
             </div>
 
@@ -172,7 +211,7 @@ export default function Login() {
             </Link>
           </p>
 
-          {/* ✅ ToastContainer inside this page */}
+          {/* ✅ ToastContainer already here */}
           <ToastContainer
             position="top-right"
             autoClose={3000}
