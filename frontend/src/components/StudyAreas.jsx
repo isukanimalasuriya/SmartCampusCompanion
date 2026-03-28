@@ -260,7 +260,6 @@ const css = `
   .campus-stat { font-weight:600; color:#111827; }
 `;
 
-/* ─── Component ─────────────────────────────────────────── */
 export default function StudyAreas() {
   const [areas, setAreas] = useState([]);
   const [selectedArea, setSelectedArea] = useState(null); // null = list view
