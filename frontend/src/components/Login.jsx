@@ -60,9 +60,9 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex font-sans">
+    <div className="font-poppins min-h-screen bg-slate-50 flex font-sans">
       {/* Left Side Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-indigo-700 items-center justify-center p-12 relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-1/2 bg-indigo-700 items-center justify-center p-12 relative overflow-hidden font-poppins">
         <div className="absolute top-0 left-0 w-full h-full opacity-10">
           <svg
             className="w-full h-full"
@@ -90,7 +90,7 @@ export default function Login() {
       </div>
 
       {/* Right Side Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 lg:p-16">
+      <div className="font-poppins w-full lg:w-1/2 flex items-center justify-center p-8 lg:p-16">
         <div className="w-full max-w-md">
           <div className="mb-10 lg:hidden flex items-center gap-2">
             <GraduationCap className="text-indigo-600 w-6 h-6" />

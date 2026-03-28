@@ -4,7 +4,14 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import API from "../api";
 import { ToastContainer, toast } from "react-toastify";
-import { LogOut, ShieldCheck, User, IdCard, Mail, GraduationCap } from "lucide-react";
+import {
+  LogOut,
+  ShieldCheck,
+  User,
+  IdCard,
+  Mail,
+  GraduationCap,
+} from "lucide-react";
 import "react-toastify/dist/ReactToastify.css";
 
 export default function Profile() {
@@ -39,7 +46,12 @@ export default function Profile() {
   };
 
   const getInitials = (name = "") =>
-    name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
+    name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
 
   if (!student) {
     return (
@@ -61,7 +73,6 @@ export default function Profile() {
       <main className="flex-1 overflow-y-auto p-6 md:p-10">
         {/* Card fills full width up to a comfortable max */}
         <div className="w-full max-w-3xl mx-auto bg-white rounded-3xl shadow-xl overflow-hidden">
-
           {/* Banner */}
           <div className="relative h-36 bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600">
             <div
@@ -95,10 +106,14 @@ export default function Profile() {
 
             {/* Name + badge */}
             <div className="mb-6">
-              <h1 className="text-2xl font-bold text-slate-900">{student.name}</h1>
+              <h1 className="text-2xl font-bold text-slate-900">
+                {student.name}
+              </h1>
               <div className="flex items-center gap-2 mt-1">
                 <ShieldCheck className="w-4 h-4 text-indigo-500" />
-                <span className="text-sm text-indigo-600 font-medium">Verified Student</span>
+                <span className="text-sm text-indigo-600 font-medium">
+                  Verified Student
+                </span>
               </div>
             </div>
 
@@ -106,10 +121,30 @@ export default function Profile() {
 
             {/* Info grid — 2 cols, stretches full card width */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <InfoCard icon={<User className="w-4 h-4" />}         label="Full Name"      value={student.name}        color="indigo" />
-              <InfoCard icon={<IdCard className="w-4 h-4" />}        label="Student ID"     value={student.studentId}   color="violet" />
-              <InfoCard icon={<Mail className="w-4 h-4" />}          label="Email Address"  value={student.email}       color="sky" />
-              <InfoCard icon={<GraduationCap className="w-4 h-4" />} label="Role"           value="Undergraduate"       color="purple" />
+              <InfoCard
+                icon={<User className="w-4 h-4" />}
+                label="Full Name"
+                value={student.name}
+                color="indigo"
+              />
+              <InfoCard
+                icon={<IdCard className="w-4 h-4" />}
+                label="Student ID"
+                value={student.studentId}
+                color="violet"
+              />
+              <InfoCard
+                icon={<Mail className="w-4 h-4" />}
+                label="Email Address"
+                value={student.email}
+                color="sky"
+              />
+              <InfoCard
+                icon={<GraduationCap className="w-4 h-4" />}
+                label="Role"
+                value="Undergraduate"
+                color="purple"
+              />
             </div>
           </div>
         </div>
@@ -125,7 +160,7 @@ export default function Profile() {
 const colorMap = {
   indigo: { wrap: "bg-indigo-50 text-indigo-600", label: "text-indigo-400" },
   violet: { wrap: "bg-violet-50 text-violet-600", label: "text-violet-400" },
-  sky:    { wrap: "bg-sky-50    text-sky-600",    label: "text-sky-400"    },
+  sky: { wrap: "bg-sky-50    text-sky-600", label: "text-sky-400" },
   purple: { wrap: "bg-purple-50 text-purple-600", label: "text-purple-400" },
 };
 
@@ -133,11 +168,17 @@ function InfoCard({ icon, label, value, color }) {
   const c = colorMap[color];
   return (
     <div className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:border-slate-200 transition-all duration-200">
-      <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${c.wrap}`}>
+      <div
+        className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${c.wrap}`}
+      >
         {icon}
       </div>
       <div className="min-w-0">
-        <p className={`text-xs font-semibold uppercase tracking-wider mb-0.5 ${c.label}`}>{label}</p>
+        <p
+          className={`text-xs font-semibold uppercase tracking-wider mb-0.5 ${c.label}`}
+        >
+          {label}
+        </p>
         <p className="text-sm font-semibold text-slate-800 truncate">{value}</p>
       </div>
     </div>

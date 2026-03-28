@@ -56,7 +56,7 @@ export const createTable = asyncHandler(async (req, res) => {
   res.status(201).json(table);
 });
 
-export const listSpaces = asyncHandler(async (req, res) => {
+export const listSpacess = asyncHandler(async (req, res) => {
   const spaces = await StudySpace.find().sort({ name: 1 });
   return res.json({ spaces });
 });
@@ -69,4 +69,21 @@ export const getSpaceTables = asyncHandler(async (req, res) => {
 
   const tables = await Table.find({ space: spaceId }).sort({ code: 1 });
   return res.json({ space, tables });
+});
+
+export const listSpaces = asyncHandler(async (req, res) => {
+  const spaces = await StudySpace.find().sort({ name: 1 }).lean();
+
+  // For each space, count GROUP and SINGLE tables
+  const spacesWithCounts = await Promise.all(
+    spaces.map(async (space) => {
+      const [groupTables, singleTables] = await Promise.all([
+        Table.countDocuments({ space: space._id, type: "GROUP" }),
+        Table.countDocuments({ space: space._id, type: "SINGLE" }),
+      ]);
+      return { ...space, groupTables, singleTables };
+    }),
+  );
+
+  return res.json({ spaces: spacesWithCounts });
 });

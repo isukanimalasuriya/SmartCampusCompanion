@@ -1,7 +1,14 @@
 import { useState } from "react";
 import API from "../api";
 import { useNavigate, Link } from "react-router-dom";
-import { User, Mail, Lock, IdCard, ArrowRight, GraduationCap } from "lucide-react";
+import {
+  User,
+  Mail,
+  Lock,
+  IdCard,
+  ArrowRight,
+  GraduationCap,
+} from "lucide-react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -43,7 +50,9 @@ export default function Register() {
     // Replace the email validation regex in Register.jsx
     if (!form.email.trim()) {
       newErrors.email = "Email is required";
-    } else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(form.email)) {
+    } else if (
+      !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(form.email)
+    ) {
       newErrors.email = "Enter a valid email address";
     }
 
@@ -80,11 +89,15 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex font-sans">
+    <div className="font-poppins min-h-screen bg-slate-50 flex font-sans">
       {/* Left Side Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-indigo-700 items-center justify-center p-12 relative overflow-hidden">
+      <div className="font-poppins hidden lg:flex lg:w-1/2 bg-indigo-700 items-center justify-center p-12 relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-full opacity-10">
-          <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+          <svg
+            className="w-full h-full"
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+          >
             <path d="M0 100 C 20 0 50 0 100 100 Z" fill="white" />
           </svg>
         </div>
@@ -99,28 +112,37 @@ export default function Register() {
             Elevate your academic journey.
           </h2>
           <p className="text-indigo-100 text-lg mb-8">
-            Access your courses, grades, and campus resources in one unified, sleek dashboard.
+            Access your courses, grades, and campus resources in one unified,
+            sleek dashboard.
           </p>
         </div>
       </div>
 
       {/* Right Side Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 lg:p-16">
+      <div className="font-poppins w-full lg:w-1/2 flex items-center justify-center p-8 lg:p-16">
         <div className="w-full max-w-md">
           <div className="mb-10 lg:hidden flex items-center gap-2">
             <GraduationCap className="text-indigo-600 w-6 h-6" />
-            <span className="font-bold text-xl text-slate-900 tracking-tight">Campus Portal</span>
+            <span className="font-bold text-xl text-slate-900 tracking-tight">
+              Campus Portal
+            </span>
           </div>
 
           <div className="mb-8">
-            <h2 className="text-3xl font-bold text-slate-900 mb-2">Create Account</h2>
-            <p className="text-slate-500">Enter your credentials to access the student hub.</p>
+            <h2 className="text-3xl font-bold text-slate-900 mb-2">
+              Create Account
+            </h2>
+            <p className="text-slate-500">
+              Enter your credentials to access the student hub.
+            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Full Name */}
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1.5">Full Name</label>
+              <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                Full Name
+              </label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
                 <input
@@ -134,12 +156,16 @@ export default function Register() {
                   }`}
                 />
               </div>
-              {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+              {errors.name && (
+                <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+              )}
             </div>
 
             {/* Student ID */}
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1.5">Student ID</label>
+              <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                Student ID
+              </label>
               <div className="relative">
                 <IdCard className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
                 <input
@@ -153,12 +179,16 @@ export default function Register() {
                   }`}
                 />
               </div>
-              {errors.studentId && <p className="text-red-500 text-sm mt-1">{errors.studentId}</p>}
+              {errors.studentId && (
+                <p className="text-red-500 text-sm mt-1">{errors.studentId}</p>
+              )}
             </div>
 
             {/* University Email */}
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1.5">University Email</label>
+              <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                University Email
+              </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
                 <input
@@ -172,12 +202,16 @@ export default function Register() {
                   }`}
                 />
               </div>
-              {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+              )}
             </div>
 
             {/* Password */}
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1.5">Password</label>
+              <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                Password
+              </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
                 <input
@@ -191,7 +225,9 @@ export default function Register() {
                   }`}
                 />
               </div>
-              {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+              {errors.password && (
+                <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+              )}
             </div>
 
             <button
@@ -205,13 +241,20 @@ export default function Register() {
 
           <p className="mt-8 text-center text-slate-600 text-sm">
             Already have an account?{" "}
-            <Link to="/" className="text-indigo-600 font-bold hover:text-indigo-700">
+            <Link
+              to="/"
+              className="text-indigo-600 font-bold hover:text-indigo-700"
+            >
               Log in
             </Link>
           </p>
 
           {/* ToastContainer inside this page */}
-          <ToastContainer position="top-right" autoClose={3000} theme="colored" />
+          <ToastContainer
+            position="top-right"
+            autoClose={3000}
+            theme="colored"
+          />
         </div>
       </div>
     </div>
