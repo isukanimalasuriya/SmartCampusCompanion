@@ -17,7 +17,7 @@ export const UserProvider = ({ children }) => {
       }
 
       try {
-        const res = await API.get("/auth/profile", {
+        const res = await API.get("/auth/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
         const userData = res.data.user || res.data;
@@ -43,7 +43,7 @@ export const UserProvider = ({ children }) => {
   }, []);
 
   return (
-    <UserContext.Provider value={{ user, loading }}>
+    <UserContext.Provider value={{ user, setUser, loading }}>
       {children}
     </UserContext.Provider>
   );
