@@ -15,6 +15,13 @@ const skillSchema = new mongoose.Schema({
     enum: ["Online", "Offline"], 
     required: true 
   },
+  isPublic: { 
+    type: Boolean, 
+    default: false 
+  },
+  meetingLink: { 
+    type: String 
+  },
   availability: { type: Date, required: true }, 
   providerName: { type: String, required: true },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: false },

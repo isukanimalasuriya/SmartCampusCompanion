@@ -21,16 +21,20 @@ export const UserProvider = ({ children }) => {
           headers: { Authorization: `Bearer ${token}` },
         });
         const userData = res.data.user || res.data;
+        const mappedUser = {
+          ...userData,
+          id: userData.id || userData._id,
+        };
 
         // create avatar initials
-        const initials = userData.name
+        const initials = (mappedUser.name || "")
           .split(" ")
           .map((n) => n[0])
           .join("")
           .toUpperCase()
           .slice(0, 2);
 
-        setUser({ ...userData, avatar: initials });
+        setUser({ ...mappedUser, avatar: initials });
       } catch (err) {
         console.error("Failed to fetch user:", err);
         setUser(null);

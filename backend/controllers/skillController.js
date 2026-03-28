@@ -4,7 +4,15 @@ import SkillRequest from "../models/SkillRequest.js";
 // Offer a new skill
 export const offerSkill = async (req, res) => {
   try {
-    const { skillName, subject, moduleCode, description, skillLevel, mode, availability, providerName } = req.body;
+    const { skillName, subject, moduleCode, description, skillLevel, mode, isPublic, availability, providerName } = req.body;
+    
+    let meetingLink = "";
+    if(mode === "Online" && isPublic) {
+      // Generate a unique Jitsi Meet link
+      const roomIdentifier = `SmartCampus-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+      meetingLink = `https://meet.jit.si/${roomIdentifier}`;
+    }
+
     const newSkill = new Skill({
       skillName,
       subject,
@@ -12,6 +20,8 @@ export const offerSkill = async (req, res) => {
       description,
       skillLevel,
       mode,
+      isPublic,
+      meetingLink,
       availability,
       providerName
     });
@@ -37,12 +47,13 @@ export const getSkills = async (req, res) => {
 // Request help for a skill
 export const requestHelp = async (req, res) => {
   try {
-    const { skillId, problemDescription, preferredTime, requesterName } = req.body;
+    const { skillId, problemDescription, preferredTime, requesterName, requesterId } = req.body;
     const newRequest = new SkillRequest({
       skillId,
       problemDescription,
       preferredTime,
-      requesterName
+      requesterName,
+      requesterId
     });
     await newRequest.save();
     
@@ -52,7 +63,8 @@ export const requestHelp = async (req, res) => {
     
     res.status(201).json({
       request: populatedRequest,
-      matchingPeers: [matchingPeer] 
+      matchingPeers: [matchingPeer],
+      meetingLink: matchingPeer?.meetingLink // Return the link immediately for public sessions
     });
   } catch (error) {
     console.error("Error in requestHelp:", error);
