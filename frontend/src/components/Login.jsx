@@ -1,9 +1,10 @@
 import { useState } from "react";
-import API from "../api";
+import API, { setAuthToken } from "../api";
 import { useNavigate, Link } from "react-router-dom";
 import { Mail, Lock, ArrowRight, GraduationCap } from "lucide-react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useUser } from "../context/UserContext";
 
 export default function Login() {
   const [form, setForm] = useState({
@@ -13,6 +14,7 @@ export default function Login() {
 
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
+  const { setUser } = useUser();
 
   // Handle input change
   const handleChange = (e) => {
@@ -49,8 +51,20 @@ export default function Login() {
       const res = await API.post("/auth/login", form);
       toast.success("Login successful!");
 
-      // Optional: store token or user data
+      // Store token
       localStorage.setItem("token", res.data.token);
+      setAuthToken(res.data.token);
+
+      // Immediately update the user context so Dashboard doesn't see null
+      const userData = res.data.user || res.data;
+      const mappedUser = { ...userData, id: userData.id || userData._id };
+      const initials = (mappedUser.name || "")
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2);
+      setUser({ ...mappedUser, avatar: initials });
 
       // Redirect to dashboard
       setTimeout(() => navigate("/dashboard"), 1500);

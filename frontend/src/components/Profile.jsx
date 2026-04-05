@@ -2,7 +2,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import API from "../api";
+import API, { setAuthToken } from "../api";
+import { useUser } from "../context/UserContext";
 import { ToastContainer, toast } from "react-toastify";
 import {
   LogOut,
@@ -17,6 +18,7 @@ import "react-toastify/dist/ReactToastify.css";
 export default function Profile() {
   const [student, setStudent] = useState(null);
   const navigate = useNavigate();
+  const { setUser } = useUser();
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -41,6 +43,8 @@ export default function Profile() {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    setAuthToken(null);
+    setUser(null);
     toast.success("Logged out successfully");
     setTimeout(() => navigate("/"), 1000);
   };

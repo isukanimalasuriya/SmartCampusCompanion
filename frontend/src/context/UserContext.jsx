@@ -1,6 +1,6 @@
 // context/UserContext.jsx
 import { createContext, useContext, useState, useEffect } from "react";
-import API from "../api";
+import API, { setAuthToken } from "../api";
 
 const UserContext = createContext();
 
@@ -15,6 +15,8 @@ export const UserProvider = ({ children }) => {
         setLoading(false);
         return;
       }
+
+      setAuthToken(token);
 
       try {
         const res = await API.get("/auth/me", {

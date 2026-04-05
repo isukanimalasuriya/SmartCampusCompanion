@@ -23,17 +23,35 @@ connectDB();
 const app = express();
 const server = http.createServer(app);
 
+const parseOrigins = (raw) => {
+  if (!raw || raw === "*") return ["http://localhost:5173"];
+  return raw.split(",").map((s) => s.trim()).filter(Boolean);
+};
+
+const FRONTEND_ORIGINS = parseOrigins(process.env.FRONTEND_ORIGIN);
+
 export const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: FRONTEND_ORIGINS.length === 1 ? FRONTEND_ORIGINS[0] : FRONTEND_ORIGINS,
     credentials: true,
   },
 });
 
-app.use(cors({
-  origin: "http://localhost:5173",
-  credentials: true,
-}));
+// Each user joins their own private room so we can send targeted events
+io.on("connection", (socket) => {
+  socket.on("join_user_room", (userId) => {
+    if (userId) {
+      socket.join(`user:${userId}`);
+    }
+  });
+});
+
+app.use(
+  cors({
+    origin: FRONTEND_ORIGINS.length === 1 ? FRONTEND_ORIGINS[0] : FRONTEND_ORIGINS,
+    credentials: true,
+  }),
+);
 
 app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
