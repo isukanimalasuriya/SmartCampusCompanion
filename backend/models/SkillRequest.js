@@ -16,5 +16,8 @@ const skillRequestSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
+skillRequestSchema.index({ requesterId: 1, createdAt: -1 });
+skillRequestSchema.index({ skillId: 1, createdAt: -1 });
+
 const SkillRequest = mongoose.model("SkillRequest", skillRequestSchema);
 export default SkillRequest;

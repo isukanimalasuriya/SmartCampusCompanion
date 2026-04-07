@@ -59,7 +59,16 @@ export const me = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user.id).select(
     "_id studentId name email",
   );
-  return res.json({ user });
+  if (!user) return res.status(404).json({ message: "User not found" });
+
+  return res.json({
+    user: {
+      id: user._id,
+      studentId: user.studentId,
+      name: user.name,
+      email: user.email,
+    },
+  });
 });
 
 //comment

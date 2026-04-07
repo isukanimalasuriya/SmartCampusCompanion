@@ -1,11 +1,9 @@
 import { useState } from "react";
-import API from "../api";
+import API, { setAuthToken } from "../api";
 import { useNavigate, Link } from "react-router-dom";
 import { Mail, Lock, ArrowRight, GraduationCap } from "lucide-react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
-// ✅ NEW: import user context
 import { useUser } from "../context/UserContext";
 
 export default function Login() {
@@ -16,14 +14,12 @@ export default function Login() {
 
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
-
-  // ✅ NEW: get setUser from context
   const { setUser } = useUser();
 
   // Handle input change
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
-    setErrors({ ...errors, [e.target.name]: "" });
+    setErrors({ ...errors, [e.target.name]: "" }); // Clear field error
   };
 
   // Validation
@@ -51,53 +47,36 @@ export default function Login() {
     e.preventDefault();
     if (!validate()) return;
 
-    // ✅ NEW: show loading toast immediately
-    const loadingToast = toast.loading("Logging in...");
-
     try {
       const res = await API.post("/auth/login", form);
+      toast.success("Login successful!");
 
-      // ✅ Update toast to success
-      toast.update(loadingToast, {
-        render: "Login successful!",
-        type: "success",
-        isLoading: false,
-        autoClose: 3000,
-        theme: "colored",
-      });
-
-      // ✅ Save token
+      // Store token
       localStorage.setItem("token", res.data.token);
+      setAuthToken(res.data.token);
 
-      // ✅ Set user in context immediately
-      const userData = res.data.user;
-      const initials = userData.name
+      // Immediately update the user context so Dashboard doesn't see null
+      const userData = res.data.user || res.data;
+      const mappedUser = { ...userData, id: userData.id || userData._id };
+      const initials = (mappedUser.name || "")
         .split(" ")
         .map((n) => n[0])
         .join("")
         .toUpperCase()
         .slice(0, 2);
+      setUser({ ...mappedUser, avatar: initials });
 
-      setUser({ ...userData, avatar: initials }); // ✅ NEW
-
-      // ✅ Navigate to dashboard
-      navigate("/dashboard"); // ✅ CHANGED
+      // Redirect to dashboard
+      setTimeout(() => navigate("/dashboard"), 1500);
     } catch (err) {
-      // ✅ Update toast to error
-      toast.update(loadingToast, {
-        render: err.response?.data?.message || "Login failed!",
-        type: "error",
-        isLoading: false,
-        autoClose: 3000,
-        theme: "colored",
-      });
+      toast.error(err.response?.data?.message || "Login failed!");
     }
   };
 
   return (
-    <div className="font-poppins min-h-screen bg-slate-50 flex font-sans">
+    <div className="min-h-screen bg-slate-50 flex font-sans">
       {/* Left Side Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-indigo-700 items-center justify-center p-12 relative overflow-hidden font-poppins">
+      <div className="hidden lg:flex lg:w-1/2 bg-indigo-700 items-center justify-center p-12 relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-full opacity-10">
           <svg
             className="w-full h-full"
@@ -112,9 +91,7 @@ export default function Login() {
             <div className="bg-white p-2 rounded-lg shadow-xl">
               <GraduationCap className="text-indigo-700 w-8 h-8" />
             </div>
-            <h1 className="text-3xl font-bold tracking-tight">
-              Campus Portal
-            </h1>
+            <h1 className="text-3xl font-bold tracking-tight">Campus Portal</h1>
           </div>
           <h2 className="text-5xl font-extrabold mb-6 leading-tight">
             Welcome Back!
@@ -127,7 +104,7 @@ export default function Login() {
       </div>
 
       {/* Right Side Form */}
-      <div className="font-poppins w-full lg:w-1/2 flex items-center justify-center p-8 lg:p-16">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 lg:p-16">
         <div className="w-full max-w-md">
           <div className="mb-10 lg:hidden flex items-center gap-2">
             <GraduationCap className="text-indigo-600 w-6 h-6" />
@@ -157,9 +134,8 @@ export default function Login() {
                   placeholder="name@gmail.com"
                   value={form.email}
                   onChange={handleChange}
-                  className={`w-full pl-11 pr-4 py-2.5 bg-white border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none ${
-                    errors.email ? "border-red-500" : "border-slate-200"
-                  }`}
+                  className={`w-full pl-11 pr-4 py-2.5 bg-white border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none ${errors.email ? "border-red-500" : "border-slate-200"
+                    }`}
                 />
               </div>
               {errors.email && (
@@ -180,15 +156,12 @@ export default function Login() {
                   placeholder="••••••••"
                   value={form.password}
                   onChange={handleChange}
-                  className={`w-full pl-11 pr-4 py-2.5 bg-white border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none ${
-                    errors.password ? "border-red-500" : "border-slate-200"
-                  }`}
+                  className={`w-full pl-11 pr-4 py-2.5 bg-white border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none ${errors.password ? "border-red-500" : "border-slate-200"
+                    }`}
                 />
               </div>
               {errors.password && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.password}
-                </p>
+                <p className="text-red-500 text-sm mt-1">{errors.password}</p>
               )}
             </div>
 
@@ -211,7 +184,7 @@ export default function Login() {
             </Link>
           </p>
 
-          {/* ✅ ToastContainer already here */}
+          {/* ✅ ToastContainer inside this page */}
           <ToastContainer
             position="top-right"
             autoClose={3000}
