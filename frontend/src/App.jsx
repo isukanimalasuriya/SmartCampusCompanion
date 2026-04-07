@@ -14,9 +14,11 @@ import Profile from "./components/Profile";
 
 import SupportTicketForm from "./components/SupportTicketForm";
 import MyTickets from "./components/MyTickets";
+import Adminticketdashboard from "./components/Adminticketdashboard";
 
 import Community from "./components/community/Community";
 import GroupDetail from "./components/community/GroupDetail";
+import ProtectedRoute from "./components/Routes/ProtectedRoute";
 
 
 function App() {
@@ -31,10 +33,21 @@ function App() {
       {/* <Route path="/dashboard/profile" element={<Profile />} /> */}
       <Route path="/support-ticket" element={<SupportTicketForm />} />
       <Route path="/my-tickets" element={<MyTickets />} />
+      <Route path="/admin/tickets" element={<Adminticketdashboard />} />
 
       <Route path="profile" element={<Profile />} />
       <Route path="/community" element={<Community />} />
       <Route path="/community/:id" element={<GroupDetail />} />
+
+      {/* Admin-protected route */}
+      <Route
+        path="/admin/tickets"
+        element={
+          <ProtectedRoute adminOnly={true}>
+            <Adminticketdashboard />
+          </ProtectedRoute>
+        }
+      />
 
 
       <Route path="/" element={<Navigate to="/dashboard" replace />} />

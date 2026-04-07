@@ -51,6 +51,7 @@ export const login = asyncHandler(async (req, res) => {
       studentId: user.studentId,
       name: user.name,
       email: user.email,
+      role: user.role, // NEW
     },
   });
 });
