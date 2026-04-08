@@ -66,8 +66,14 @@ export default function Login() {
         .slice(0, 2);
       setUser({ ...mappedUser, avatar: initials });
 
-      // Redirect to dashboard
-      setTimeout(() => navigate("/dashboard"), 1500);
+      // Store role in localStorage
+      if (userData.role) {
+        localStorage.setItem("role", userData.role);
+      }
+
+      // Redirect based on role
+      const dashboardPath = userData.role === "admin" ? "/admin/tickets" : "/dashboard";
+      setTimeout(() => navigate(dashboardPath), 1500);
     } catch (err) {
       toast.error(err.response?.data?.message || "Login failed!");
     }

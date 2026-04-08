@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import { useUser } from "../context/UserContext";
 import "react-toastify/dist/ReactToastify.css";
 
 // ─── helpers ────────────────────────────────────────────────────────────────
@@ -36,6 +38,9 @@ const Adminticketdashboard = () => {
   const [reply, setReply]                 = useState("");
   const [sending, setSending]             = useState(false);
   const bottomRef                         = useRef(null);
+
+  const navigate = useNavigate();
+  const { logout } = useUser();
 
   // ── fetch list ──
   const fetchTickets = async (status = filter) => {
@@ -146,12 +151,23 @@ const Adminticketdashboard = () => {
               <h1 className="text-lg font-extrabold text-slate-900 leading-tight">Support Ticket Dashboard</h1>
             </div>
           </div>
-          <button
-            onClick={() => fetchTickets(filter)}
-            className="text-xs font-semibold text-slate-500 hover:text-indigo-600 border border-slate-200 hover:border-indigo-300 bg-white px-3 py-1.5 rounded-lg transition-all"
-          >
-            ↻ Refresh
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => fetchTickets(filter)}
+              className="text-xs font-semibold text-slate-500 hover:text-indigo-600 border border-slate-200 hover:border-indigo-300 bg-white px-3 py-1.5 rounded-lg transition-all"
+            >
+              ↻ Refresh
+            </button>
+            <button
+              onClick={() => {
+                logout();
+                navigate("/");
+              }}
+              className="text-xs font-semibold text-red-500 hover:text-red-600 border border-red-200 hover:border-red-300 bg-white px-3 py-1.5 rounded-lg transition-all"
+            >
+              Logout
+            </button>
+          </div>
         </div>
       </div>
 

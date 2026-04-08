@@ -58,7 +58,7 @@ export const login = asyncHandler(async (req, res) => {
 
 export const me = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user.id).select(
-    "_id studentId name email",
+    "_id studentId name email role",
   );
   if (!user) return res.status(404).json({ message: "User not found" });
 
@@ -68,6 +68,7 @@ export const me = asyncHandler(async (req, res) => {
       studentId: user.studentId,
       name: user.name,
       email: user.email,
+      role: user.role,
     },
   });
 });

@@ -30,10 +30,8 @@ function App() {
       <Route path="studyareas" element={<StudyAreas />}></Route>
       <Route path="skill-exchange" element={<SkillExchange />}></Route>
 
-      {/* <Route path="/dashboard/profile" element={<Profile />} /> */}
       <Route path="/support-ticket" element={<SupportTicketForm />} />
       <Route path="/my-tickets" element={<MyTickets />} />
-      <Route path="/admin/tickets" element={<Adminticketdashboard />} />
 
       <Route path="profile" element={<Profile />} />
       <Route path="/community" element={<Community />} />

@@ -24,6 +24,10 @@ export function UserProvider({ children }) {
             .slice(0, 2);
 
           setUser({ ...u, avatar: initials });
+          // Store role in localStorage
+          if (u.role) {
+            localStorage.setItem("role", u.role);
+          }
         })
         .catch(() => {
           // Remove invalid token & role
