@@ -1,3 +1,4 @@
+import React from "react"; // ✅ Add this
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import ReactDOM from "react-dom/client";
@@ -7,9 +8,11 @@ import App from "./App.jsx";
 import { UserProvider } from "./context/UserContext.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <BrowserRouter>
+  <React.StrictMode>
     <UserProvider>
-      <App />
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
     </UserProvider>
-  </BrowserRouter>,
+  </React.StrictMode>,
 );

@@ -69,7 +69,7 @@ export const sendChatMessage = asyncHandler(async (req, res) => {
 
   try {
     const client = getGeminiClient();
-    const model = client.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const model = client.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
 
     const prompt = `${systemPrompt}\n\nConversation:\n${conversation}\nAI:`;
 
