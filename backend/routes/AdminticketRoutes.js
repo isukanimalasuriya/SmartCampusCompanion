@@ -23,10 +23,10 @@ const isAdmin = (req, res, next) => {
 // All routes require auth + admin
 router.use(auth, isAdmin);
 
-router.get("/tickets", getAllTickets);                          // GET  /api/admin/tickets?status=active
-router.get("/tickets/:id", getTicketByIdAdmin);                // GET  /api/admin/tickets/:id
-router.post("/tickets/:id/reply", adminReplyToTicket);         // POST /api/admin/tickets/:id/reply
-router.patch("/tickets/:id/status", updateTicketStatusAdmin);  // PATCH /api/admin/tickets/:id/status
-router.delete("/tickets/:id", deleteTicketAdmin);              // DELETE /api/admin/tickets/:id
+router.get("/tickets", getAllTickets); // GET  /api/admin/tickets?status=active
+router.get("/tickets/:id", getTicketByIdAdmin); // GET  /api/admin/tickets/:id
+router.post("/tickets/:id/reply", adminReplyToTicket); // POST /api/admin/tickets/:id/reply
+router.patch("/tickets/:id/status", updateTicketStatusAdmin); // PATCH /api/admin/tickets/:id/status
+router.delete("/tickets/:id", deleteTicketAdmin); // DELETE /api/admin/tickets/:id
 
 export default router;

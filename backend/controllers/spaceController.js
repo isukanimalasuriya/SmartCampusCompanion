@@ -5,18 +5,19 @@ import { asyncHandler } from "../middleware/asyncHandler.js";
 //Create Study Space
 export const createSpace = asyncHandler(async (req, res) => {
   const { name, location, totalSeats } = req.body;
+  const total = Number(totalSeats);
 
-  if (!name || !location || !totalSeats) {
+  if (!name || !location || !Number.isFinite(total) || total < 0) {
     return res.status(400).json({
-      message: "name, location, and totalSeats are required",
+      message: "name, location, and totalSeats (0 or greater) are required",
     });
   }
 
   const space = await StudySpace.create({
     name,
     location,
-    totalSeats,
-    availableSeats: totalSeats,
+    totalSeats: total,
+    availableSeats: total,
   });
 
   res.status(201).json(space);
@@ -86,4 +87,18 @@ export const listSpaces = asyncHandler(async (req, res) => {
   );
 
   return res.json({ spaces: spacesWithCounts });
+});
+
+export const deleteSpace = asyncHandler(async (req, res) => {
+  const { spaceId } = req.params;
+
+  const space = await StudySpace.findById(spaceId);
+  if (!space) return res.status(404).json({ message: "Study space not found" });
+
+  // Delete all tables belonging to this space first
+  await Table.deleteMany({ space: spaceId });
+
+  await space.deleteOne();
+
+  res.json({ message: "Study space and its tables deleted successfully" });
 });

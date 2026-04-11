@@ -72,7 +72,7 @@ export default function Login() {
       }
 
       // Redirect based on role
-      const dashboardPath = userData.role === "admin" ? "/admin/tickets" : "/dashboard";
+      const dashboardPath = userData.role === "admin" ? "/admin/dashboard" : "/dashboard";
       setTimeout(() => navigate(dashboardPath), 1500);
     } catch (err) {
       toast.error(err.response?.data?.message || "Login failed!");

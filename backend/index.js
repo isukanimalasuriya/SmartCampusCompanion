@@ -11,6 +11,7 @@ import skillRoutes from "./routes/skillRoutes.js";
 import ticketRoutes from "./routes/ticketRoutes.js";
 import aiRoutes from "./routes/aiRoutes.js";
 import adminTicketRoutes from "./routes/adminTicketRoutes.js";
+import adminSpaceRoutes from "./routes/adminSpaceRoutes.js";
 
 import { errorHandler } from "./middleware/errorHandler.js";
 import cors from "cors";
@@ -70,6 +71,7 @@ app.use("/api/skills", skillRoutes);
 app.use("/api/tickets", ticketRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/admin", adminTicketRoutes);
+app.use("/api/admin", adminSpaceRoutes);
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
