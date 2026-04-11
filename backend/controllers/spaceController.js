@@ -5,18 +5,19 @@ import { asyncHandler } from "../middleware/asyncHandler.js";
 //Create Study Space
 export const createSpace = asyncHandler(async (req, res) => {
   const { name, location, totalSeats } = req.body;
+  const total = Number(totalSeats);
 
-  if (!name || !location || !totalSeats) {
+  if (!name || !location || !Number.isFinite(total) || total < 0) {
     return res.status(400).json({
-      message: "name, location, and totalSeats are required",
+      message: "name, location, and totalSeats (0 or greater) are required",
     });
   }
 
   const space = await StudySpace.create({
     name,
     location,
-    totalSeats,
-    availableSeats: totalSeats,
+    totalSeats: total,
+    availableSeats: total,
   });
 
   res.status(201).json(space);

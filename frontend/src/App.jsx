@@ -15,11 +15,11 @@ import Profile from "./components/Profile";
 import SupportTicketForm from "./components/SupportTicketForm";
 import MyTickets from "./components/MyTickets";
 import Adminticketdashboard from "./components/Adminticketdashboard";
+import AdminStudySpaces from "./components/AdminStudySpaces";
 
 import Community from "./components/community/Community";
 import GroupDetail from "./components/community/GroupDetail";
 import ProtectedRoute from "./components/Routes/ProtectedRoute";
-
 
 function App() {
   return (
@@ -46,7 +46,14 @@ function App() {
           </ProtectedRoute>
         }
       />
-
+      <Route
+        path="/admin/study-spaces"
+        element={
+          <ProtectedRoute adminOnly={true}>
+            <AdminStudySpaces />
+          </ProtectedRoute>
+        }
+      />
 
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="*" element={<div>Not Found</div>} />

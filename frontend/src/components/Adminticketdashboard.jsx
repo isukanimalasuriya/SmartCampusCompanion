@@ -1,8 +1,18 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
-import { useNavigate } from "react-router-dom";
-import { useUser } from "../context/UserContext";
+import {
+  Lock,
+  BookOpen,
+  Wrench,
+  CreditCard,
+  MessageCircle,
+  Inbox,
+  Ticket,
+  Trash2,
+  RefreshCw,
+} from "lucide-react";
+import AdminNavbar from "./admin/AdminNavbar";
 import "react-toastify/dist/ReactToastify.css";
 
 // ─── helpers ────────────────────────────────────────────────────────────────
@@ -13,12 +23,14 @@ const authHeaders = () => ({
 });
 
 const categoryMeta = {
-  "Account Access":  { icon: "🔒", iconBg: "bg-violet-100",  grad: "from-violet-500 to-purple-600"  },
-  "Course Materials":{ icon: "📚", iconBg: "bg-blue-100",    grad: "from-blue-500 to-indigo-600"    },
-  "Technical Issue": { icon: "⚙️", iconBg: "bg-amber-100",   grad: "from-amber-400 to-orange-500"   },
-  "Billing":         { icon: "💳", iconBg: "bg-emerald-100", grad: "from-emerald-500 to-teal-600"   },
-  "General Inquiry": { icon: "💬", iconBg: "bg-pink-100",    grad: "from-pink-500 to-rose-500"      },
+  "Account Access":  { Icon: Lock,        iconBg: "bg-violet-100",  iconClass: "text-violet-600" },
+  "Course Materials":{ Icon: BookOpen,    iconBg: "bg-blue-100",    iconClass: "text-blue-600" },
+  "Technical Issue": { Icon: Wrench,      iconBg: "bg-amber-100",   iconClass: "text-amber-600" },
+  "Billing":         { Icon: CreditCard,  iconBg: "bg-emerald-100", iconClass: "text-emerald-600" },
+  "General Inquiry": { Icon: MessageCircle, iconBg: "bg-pink-100",    iconClass: "text-pink-600" },
 };
+
+const defaultCategoryMeta = { Icon: MessageCircle, iconBg: "bg-slate-100", iconClass: "text-slate-500" };
 
 const statusCfg = {
   active:    { label: "Active",    dot: "bg-amber-400",   badge: "bg-amber-100 text-amber-800 ring-1 ring-amber-300",       row: "border-l-amber-400",   hdr: "from-amber-50"   },
@@ -38,9 +50,6 @@ const Adminticketdashboard = () => {
   const [reply, setReply]                 = useState("");
   const [sending, setSending]             = useState(false);
   const bottomRef                         = useRef(null);
-
-  const navigate = useNavigate();
-  const { logout } = useUser();
 
   // ── fetch list ──
   const fetchTickets = async (status = filter) => {
@@ -139,39 +148,28 @@ const Adminticketdashboard = () => {
 
   // ─── render ─────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-slate-50 font-sans">
+    <div className="min-h-screen bg-slate-50 font-poppins flex flex-col">
+      <AdminNavbar
+        extraActions={
+          <button
+            type="button"
+            onClick={() => fetchTickets(filter)}
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-indigo-600 border border-slate-200 hover:border-indigo-300 bg-white px-3 py-1.5 rounded-lg transition-all"
+          >
+            <RefreshCw className="w-3.5 h-3.5" />
+            Refresh
+          </button>
+        }
+      />
 
-      {/* ── Header ── */}
-      <div className="bg-white border-b border-slate-100 shadow-sm sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-600 to-violet-700 flex items-center justify-center text-white text-xs font-black shadow">A</div>
-            <div>
-              <p className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest">CampusCompanion · Admin</p>
-              <h1 className="text-lg font-extrabold text-slate-900 leading-tight">Support Ticket Dashboard</h1>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => fetchTickets(filter)}
-              className="text-xs font-semibold text-slate-500 hover:text-indigo-600 border border-slate-200 hover:border-indigo-300 bg-white px-3 py-1.5 rounded-lg transition-all"
-            >
-              ↻ Refresh
-            </button>
-            <button
-              onClick={() => {
-                logout();
-                navigate("/");
-              }}
-              className="text-xs font-semibold text-red-500 hover:text-red-600 border border-red-200 hover:border-red-300 bg-white px-3 py-1.5 rounded-lg transition-all"
-            >
-              Logout
-            </button>
-          </div>
+      <div className="flex-1 flex flex-col min-h-0 max-w-7xl mx-auto w-full px-6 pt-4 pb-6">
+        <div className="mb-4 shrink-0">
+          <p className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest">Support</p>
+          <h1 className="text-lg font-extrabold text-slate-900 leading-tight">Support Ticket Dashboard</h1>
+          <p className="text-xs text-slate-400 mt-0.5">Open a ticket on the left to view and reply.</p>
         </div>
-      </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-6 flex gap-5 h-[calc(100vh-73px)]">
+        <div className="flex-1 flex gap-5 min-h-0">
 
         {/* ══ LEFT PANEL: ticket list ═════════════════════════════════════════ */}
         <div className="w-[380px] shrink-0 flex flex-col gap-4">
@@ -221,13 +219,16 @@ const Adminticketdashboard = () => {
               </div>
             ) : tickets.length === 0 ? (
               <div className="bg-white rounded-2xl border border-dashed border-slate-200 py-14 text-center">
-                <p className="text-3xl mb-2">📭</p>
+                <div className="flex justify-center mb-3 text-slate-400">
+                  <Inbox className="w-10 h-10" strokeWidth={1.5} />
+                </div>
                 <p className="text-sm font-bold text-slate-600">No {filter !== "all" ? filter : ""} tickets</p>
               </div>
             ) : (
               tickets.map((ticket) => {
                 const cfg  = statusCfg[ticket.status] || statusCfg.active;
-                const meta = categoryMeta[ticket.category] || { icon: "💬", iconBg: "bg-slate-100", grad: "from-slate-300 to-slate-400" };
+                const meta = categoryMeta[ticket.category] || defaultCategoryMeta;
+                const CatIcon = meta.Icon;
                 const firstUser = ticket.messages?.find(m => m.role === "user")?.content;
                 const isActive  = selected?._id === ticket._id;
 
@@ -242,7 +243,9 @@ const Adminticketdashboard = () => {
                     }`}
                   >
                     <div className="flex items-start gap-3">
-                      <div className={`w-9 h-9 rounded-lg ${meta.iconBg} flex items-center justify-center text-lg shrink-0`}>{meta.icon}</div>
+                      <div className={`w-9 h-9 rounded-lg ${meta.iconBg} flex items-center justify-center shrink-0`}>
+                        <CatIcon className={`w-5 h-5 ${meta.iconClass}`} strokeWidth={2} />
+                      </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-2">
                           <p className="font-bold text-slate-800 text-sm truncate">{ticket.category}</p>
@@ -273,7 +276,9 @@ const Adminticketdashboard = () => {
             </div>
           ) : !selected ? (
             <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center px-8">
-              <div className="w-16 h-16 rounded-2xl bg-indigo-50 flex items-center justify-center text-3xl mb-1">🎫</div>
+              <div className="w-16 h-16 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 mb-1">
+                <Ticket className="w-8 h-8" strokeWidth={1.75} />
+              </div>
               <p className="font-bold text-slate-700 text-lg">Select a ticket</p>
               <p className="text-sm text-slate-400 max-w-xs">Click any ticket on the left to view the conversation and reply as admin.</p>
             </div>
@@ -282,10 +287,13 @@ const Adminticketdashboard = () => {
               {/* Detail header */}
               {(() => {
                 const cfg  = statusCfg[selected.status] || statusCfg.active;
-                const meta = categoryMeta[selected.category] || { icon: "💬", iconBg: "bg-slate-100" };
+                const meta = categoryMeta[selected.category] || defaultCategoryMeta;
+                const CatIcon = meta.Icon;
                 return (
                   <div className={`px-6 py-4 border-b border-slate-100 bg-gradient-to-r ${cfg.hdr} to-white flex items-center gap-4`}>
-                    <div className={`w-10 h-10 rounded-xl ${meta.iconBg} flex items-center justify-center text-xl shrink-0 shadow-sm`}>{meta.icon}</div>
+                    <div className={`w-10 h-10 rounded-xl ${meta.iconBg} flex items-center justify-center shrink-0 shadow-sm`}>
+                      <CatIcon className={`w-5 h-5 ${meta.iconClass}`} strokeWidth={2} />
+                    </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-bold text-slate-900">{selected.category}</p>
                       <p className="text-xs text-slate-400 mt-0.5">
@@ -309,10 +317,12 @@ const Adminticketdashboard = () => {
                         </button>
                       ))}
                       <button
+                        type="button"
                         onClick={() => deleteTicket(selected._id)}
-                        className="ml-1 text-[10px] font-bold text-rose-500 border border-rose-200 bg-rose-50 hover:bg-rose-100 px-2.5 py-1 rounded-full transition-all"
+                        className="ml-1 inline-flex items-center gap-1 text-[10px] font-bold text-rose-500 border border-rose-200 bg-rose-50 hover:bg-rose-100 px-2.5 py-1 rounded-full transition-all"
                       >
-                        🗑️ Delete
+                        <Trash2 className="w-3 h-3" />
+                        Delete
                       </button>
                     </div>
                   </div>
@@ -389,6 +399,7 @@ const Adminticketdashboard = () => {
               </div>
             </>
           )}
+        </div>
         </div>
       </div>
 
