@@ -46,14 +46,6 @@ function App() {
           </ProtectedRoute>
         }
       />
-      <Route
-        path="/admin/study-spaces"
-        element={
-          <ProtectedRoute adminOnly={true}>
-            <AdminStudySpaces />
-          </ProtectedRoute>
-        }
-      />
 
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="*" element={<div>Not Found</div>} />
