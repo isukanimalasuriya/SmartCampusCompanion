@@ -20,6 +20,7 @@ import AdminStudySpaces from "./components/AdminStudySpaces";
 import Community from "./components/community/Community";
 import GroupDetail from "./components/community/GroupDetail";
 import ProtectedRoute from "./components/Routes/ProtectedRoute";
+import AdminDashboard from "./components/AdminDashboard";
 
 function App() {
   return (
@@ -39,10 +40,27 @@ function App() {
 
       {/* Admin-protected route */}
       <Route
+        path="/admin/dashboard"
+        element={
+          <ProtectedRoute adminOnly={true}>
+            <AdminDashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
         path="/admin/tickets"
         element={
           <ProtectedRoute adminOnly={true}>
             <Adminticketdashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/study-spaces"
+        element={
+          <ProtectedRoute adminOnly={true}>
+            <AdminStudySpaces />
           </ProtectedRoute>
         }
       />

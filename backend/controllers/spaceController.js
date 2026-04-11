@@ -88,3 +88,17 @@ export const listSpaces = asyncHandler(async (req, res) => {
 
   return res.json({ spaces: spacesWithCounts });
 });
+
+export const deleteSpace = asyncHandler(async (req, res) => {
+  const { spaceId } = req.params;
+
+  const space = await StudySpace.findById(spaceId);
+  if (!space) return res.status(404).json({ message: "Study space not found" });
+
+  // Delete all tables belonging to this space first
+  await Table.deleteMany({ space: spaceId });
+
+  await space.deleteOne();
+
+  res.json({ message: "Study space and its tables deleted successfully" });
+});
