@@ -28,14 +28,18 @@ const server = http.createServer(app);
 
 const parseOrigins = (raw) => {
   if (!raw || raw === "*") return ["http://localhost:5173"];
-  return raw.split(",").map((s) => s.trim()).filter(Boolean);
+  return raw
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
 };
 
 const FRONTEND_ORIGINS = parseOrigins(process.env.FRONTEND_ORIGIN);
 
 export const io = new Server(server, {
   cors: {
-    origin: FRONTEND_ORIGINS.length === 1 ? FRONTEND_ORIGINS[0] : FRONTEND_ORIGINS,
+    origin:
+      FRONTEND_ORIGINS.length === 1 ? FRONTEND_ORIGINS[0] : FRONTEND_ORIGINS,
     credentials: true,
   },
 });
@@ -51,7 +55,8 @@ io.on("connection", (socket) => {
 
 app.use(
   cors({
-    origin: FRONTEND_ORIGINS.length === 1 ? FRONTEND_ORIGINS[0] : FRONTEND_ORIGINS,
+    origin:
+      FRONTEND_ORIGINS.length === 1 ? FRONTEND_ORIGINS[0] : FRONTEND_ORIGINS,
     credentials: true,
   }),
 );

@@ -10,6 +10,8 @@ import {
   LogOut,
   Search,
 } from "lucide-react";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const socket = io("http://localhost:5000");
 
@@ -394,6 +396,7 @@ export default function StudyAreas() {
       <div className="sa-root font-poppins flex h-screen">
         <Navbar />
         <div className="sa-page">
+          <ToastContainer position="top-right" autoClose={2000} />
           {/* ── Header ── */}
           {!selectedArea && (
             <>
@@ -582,11 +585,23 @@ export default function StudyAreas() {
                         isDisabled ? "table-card--disabled" : "",
                       ].join(" ")}
                       onClick={() => {
-                        if (isDisabled) return;
+                        if (activeBooking && !isMyBooking) {
+                          toast.error(
+                            "You already have a booking. Cannot book another table.",
+                          );
+                          return;
+                        }
+
+                        if (table.availableSeats === 0) {
+                          toast.warning("This table is fully booked.");
+                          return;
+                        }
+
                         if (isSelected) {
                           setSelectedTable(null);
                           return;
                         }
+
                         setSelectedTable(table);
                         setSeats(1);
                       }}
