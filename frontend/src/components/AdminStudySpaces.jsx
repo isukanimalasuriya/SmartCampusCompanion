@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { toast, ToastContainer } from "react-toastify";
+import { QRCodeCanvas } from "qrcode.react";
 import { Building2, MapPin, RefreshCw, Trash2 } from "lucide-react";
 import API from "../api";
 import AdminNavbar from "./admin/AdminNavbar";
@@ -30,6 +31,52 @@ export default function AdminStudySpaces() {
   const [confirmDeleteId, setConfirmDeleteId] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
   // ──────────────────────────────────────────────────────────────────────
+
+  const getTableQrUrl = (spaceId, tableId) =>
+    `${window.location.origin}/studyareas?spaceId=${spaceId}&tableId=${tableId}`;
+
+  const printTableQr = (space, table) => {
+    const canvas = document.getElementById(`table-qr-${table._id}`);
+    if (!canvas || typeof canvas.toDataURL !== "function") {
+      toast.error("QR code is not ready yet. Try again.");
+      return;
+    }
+
+    const qrImageUrl = canvas.toDataURL("image/png");
+    const scanUrl = getTableQrUrl(space._id, table._id);
+    const popup = window.open("", "_blank", "width=620,height=820");
+
+    if (!popup) {
+      toast.error("Pop-up blocked. Please allow pop-ups to print QR.");
+      return;
+    }
+
+    popup.document.write(`
+      <html>
+        <head>
+          <title>Table ${table.code} QR</title>
+          <style>
+            body { font-family: Arial, sans-serif; text-align: center; padding: 32px; }
+            h1 { margin-bottom: 6px; }
+            p { margin: 6px 0; color: #444; }
+            img { margin: 20px auto; display: block; width: 240px; height: 240px; }
+            .url { margin-top: 12px; font-size: 12px; word-break: break-all; color: #666; }
+          </style>
+        </head>
+        <body>
+          <h1>${space.name} - ${table.code}</h1>
+          <p>${table.type === "GROUP" ? "Group" : "Single"} table</p>
+          <p>Capacity: ${table.capacity} seats</p>
+          <img src="${qrImageUrl}" alt="QR for table ${table.code}" />
+          <p class="url">${scanUrl}</p>
+          <script>
+            window.onload = function() { window.print(); };
+          </script>
+        </body>
+      </html>
+    `);
+    popup.document.close();
+  };
 
   const fetchSpaces = useCallback(async () => {
     setLoading(true);
@@ -447,20 +494,47 @@ export default function AdminStudySpaces() {
                         {detail.tables.map((tbl) => (
                           <div
                             key={tbl._id}
-                            className="flex items-center justify-between bg-white border border-slate-100 rounded-xl px-4 py-3 text-sm"
+                            className="bg-white border border-slate-100 rounded-xl px-4 py-3 text-sm"
                           >
-                            <div>
-                              <span className="font-bold text-slate-800">
-                                {tbl.code}
-                              </span>
-                              <span className="text-slate-400 mx-2">·</span>
-                              <span className="text-slate-600">
-                                {tbl.type === "GROUP" ? "Group" : "Single"}
-                              </span>
+                            <div className="flex items-center justify-between gap-4">
+                              <div>
+                                <span className="font-bold text-slate-800">
+                                  {tbl.code}
+                                </span>
+                                <span className="text-slate-400 mx-2">·</span>
+                                <span className="text-slate-600">
+                                  {tbl.type === "GROUP" ? "Group" : "Single"}
+                                </span>
+                                <div className="text-xs font-semibold text-slate-600 mt-1">
+                                  {tbl.availableSeats}/{tbl.capacity} seats
+                                  available
+                                </div>
+                              </div>
+                              <div className="rounded-lg border border-slate-200 p-2 bg-slate-50">
+                                <QRCodeCanvas
+                                  id={`table-qr-${tbl._id}`}
+                                  value={getTableQrUrl(detail.space._id, tbl._id)}
+                                  size={80}
+                                  includeMargin={true}
+                                />
+                              </div>
                             </div>
-                            <div className="text-xs font-semibold text-slate-600">
-                              {tbl.availableSeats}/{tbl.capacity} seats
-                              available
+                            <div className="mt-3 flex items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => printTableQr(detail.space, tbl)}
+                                className="text-[11px] font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-2.5 py-1.5 rounded-lg transition-all"
+                              >
+                                Print QR
+                              </button>
+                              <a
+                                href={getTableQrUrl(detail.space._id, tbl._id)}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-[11px] font-semibold text-slate-600 hover:text-slate-800 underline underline-offset-2"
+                              >
+                                Open scan link
+                              </a>
                             </div>
                           </div>
                         ))}
