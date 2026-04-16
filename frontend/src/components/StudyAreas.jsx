@@ -1,5 +1,6 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { io } from "socket.io-client";
+import { useLocation } from "react-router-dom";
 import Navbar from "./Navbar";
 import {
   MapPin,
@@ -263,6 +264,7 @@ const css = `
 `;
 
 export default function StudyAreas() {
+  const location = useLocation();
   const [areas, setAreas] = useState([]);
   const [selectedArea, setSelectedArea] = useState(null); // null = list view
   const [activeBooking, setActiveBooking] = useState(null);
@@ -270,6 +272,7 @@ export default function StudyAreas() {
   const [seats, setSeats] = useState(1);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
+  const [qrTarget, setQrTarget] = useState({ spaceId: "", tableId: "" });
 
   const token = localStorage.getItem("token");
   const headers = { Authorization: `Bearer ${token}` };
@@ -302,6 +305,53 @@ export default function StudyAreas() {
     setSelectedTable(null);
     setSeats(1);
   };
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const spaceId = params.get("spaceId") || "";
+    const tableId = params.get("tableId") || "";
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setQrTarget({ spaceId, tableId });
+  }, [location.search]);
+
+  useEffect(() => {
+    if (!qrTarget.spaceId || selectedArea?._id === qrTarget.spaceId) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchTables(qrTarget.spaceId);
+  }, [qrTarget.spaceId, selectedArea?._id]);
+
+  useEffect(() => {
+    if (!selectedArea || !qrTarget.tableId || selectedArea._id !== qrTarget.spaceId) {
+      return;
+    }
+
+    const targetTable = selectedArea.tables?.find((t) => t._id === qrTarget.tableId);
+    if (!targetTable) {
+      toast.error("Scanned table could not be found.");
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setQrTarget({ spaceId: "", tableId: "" });
+      return;
+    }
+
+    if (
+      activeBooking &&
+      activeBooking.table?._id !== targetTable._id &&
+      activeBooking.table !== targetTable._id
+    ) {
+      toast.info("You already have an active booking.");
+      setQrTarget({ spaceId: "", tableId: "" });
+      return;
+    }
+
+    if (targetTable.availableSeats === 0) {
+      toast.warning(`Table ${targetTable.code} is fully booked right now.`);
+    }
+
+    setSelectedTable(targetTable);
+    setSeats(1);
+    toast.success(`Loaded ${targetTable.code}.`);
+    setQrTarget({ spaceId: "", tableId: "" });
+  }, [selectedArea, qrTarget, activeBooking]);
 
   /* Check-in */
   const handleCheckIn = async () => {
