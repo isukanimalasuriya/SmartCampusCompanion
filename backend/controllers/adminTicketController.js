@@ -1,9 +1,12 @@
 import Ticket from "../models/Ticket.js";
 import { asyncHandler } from "../middleware/asyncHandler.js";
+import { sendEmail } from "../utils/sendEmail.js";
 
-// GET /api/admin/tickets — all tickets with optional status filter
+// ─────────────────────────────────────────────
+// GET ALL TICKETS (with optional status filter)
+// ─────────────────────────────────────────────
 export const getAllTickets = asyncHandler(async (req, res) => {
-  const { status } = req.query; // ?status=active | resolved | escalated
+  const { status } = req.query;
 
   const query = status && status !== "all" ? { status } : {};
 
@@ -14,17 +17,27 @@ export const getAllTickets = asyncHandler(async (req, res) => {
   res.json({ tickets });
 });
 
-// GET /api/admin/tickets/:id — single ticket detail
+
+// ─────────────────────────────────────────────
+// GET SINGLE TICKET (ADMIN VIEW)
+// ─────────────────────────────────────────────
 export const getTicketByIdAdmin = asyncHandler(async (req, res) => {
   const ticket = await Ticket.findById(req.params.id).populate(
     "user",
     "name email studentId"
   );
-  if (!ticket) return res.status(404).json({ message: "Ticket not found" });
+
+  if (!ticket) {
+    return res.status(404).json({ message: "Ticket not found" });
+  }
+
   res.json({ ticket });
 });
 
-// POST /api/admin/tickets/:id/reply — admin sends a message into the ticket
+
+// ─────────────────────────────────────────────
+// ADMIN REPLY TO TICKET
+// ─────────────────────────────────────────────
 export const adminReplyToTicket = asyncHandler(async (req, res) => {
   const { message } = req.body;
 
@@ -36,20 +49,27 @@ export const adminReplyToTicket = asyncHandler(async (req, res) => {
     "user",
     "name email studentId"
   );
-  if (!ticket) return res.status(404).json({ message: "Ticket not found" });
 
-  // Push as an "ai" role message so the existing chat UI renders it correctly
+  if (!ticket) {
+    return res.status(404).json({ message: "Ticket not found" });
+  }
+
+  // Add admin message
   ticket.messages.push({
     role: "ai",
     content: `[Admin — ${req.user.name || "Support Team"}]: ${message.trim()}`,
   });
+
   ticket.updatedAt = new Date();
   await ticket.save();
 
   res.json({ ticket });
 });
 
-// PATCH /api/admin/tickets/:id/status — admin can force any status
+
+// ─────────────────────────────────────────────
+// UPDATE TICKET STATUS + SEND EMAIL
+// ─────────────────────────────────────────────
 export const updateTicketStatusAdmin = asyncHandler(async (req, res) => {
   const { status } = req.body;
 
@@ -57,21 +77,53 @@ export const updateTicketStatusAdmin = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "Invalid status" });
   }
 
-  const ticket = await Ticket.findById(req.params.id);
-  if (!ticket) return res.status(404).json({ message: "Ticket not found" });
+  // IMPORTANT: populate user for email
+  const ticket = await Ticket.findById(req.params.id).populate("user");
+
+  if (!ticket) {
+    return res.status(404).json({ message: "Ticket not found" });
+  }
+
+  const previousStatus = ticket.status;
 
   ticket.status = status;
   ticket.updatedAt = new Date();
   await ticket.save();
 
+  // ───── EMAIL NOTIFICATION ─────
+  if (status === "resolved" && previousStatus !== "resolved") {
+    try {
+      await sendEmail(
+        ticket.user.email,
+        "Your Support Ticket is Resolved ✅",
+        `Hello ${ticket.user.name},
+
+Your support ticket regarding "${ticket.category}" has been resolved successfully.
+
+If you have any further issues, feel free to contact us.
+
+— CampusCompanion Support Team`
+      );
+    } catch (error) {
+      console.error("❌ Email sending failed:", error);
+    }
+  }
+
   res.json({ ticket });
 });
 
-// DELETE /api/admin/tickets/:id — admin hard-delete
+
+// ─────────────────────────────────────────────
+// DELETE TICKET
+// ─────────────────────────────────────────────
 export const deleteTicketAdmin = asyncHandler(async (req, res) => {
   const ticket = await Ticket.findById(req.params.id);
-  if (!ticket) return res.status(404).json({ message: "Ticket not found" });
+
+  if (!ticket) {
+    return res.status(404).json({ message: "Ticket not found" });
+  }
 
   await ticket.deleteOne();
+
   res.json({ message: "Ticket deleted" });
 });
