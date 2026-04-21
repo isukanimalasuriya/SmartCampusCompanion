@@ -1,3 +1,4 @@
+// backend/models/Group.js
 import mongoose from "mongoose";
 
 const groupSchema = new mongoose.Schema(
@@ -50,7 +51,7 @@ const groupSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// ✅ Use async instead of next() callback — avoids the "next is not a function" error
+// Pre-save hook for invite code
 groupSchema.pre("save", async function () {
   if (!this.inviteCode && this.isNew) {
     const characters = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -88,5 +89,7 @@ groupSchema.methods.addMember = function (userId, role = "member") {
   this.members.push({ user: userId, role, joinedAt: new Date() });
 };
 
-const Group = mongoose.model("Group", groupSchema);
+// ✅ FIX: Check if model already exists before creating
+const Group = mongoose.models.Group || mongoose.model("Group", groupSchema);
+
 export default Group;
