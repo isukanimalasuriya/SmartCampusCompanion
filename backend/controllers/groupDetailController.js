@@ -4,7 +4,11 @@ import Message from "../models/message.js";
 import Resource from "../models/resource.js";
 import Announcement from "../models/announcement.js";
 import Group from "../models/group.js";
-import { cleanText } from "../config/profanity.js";
+import ProfanityLog from "../models/ProfanityLog.js";
+import GroupSettings from "../models/GroupSettings.js";
+import Strike from "../models/Strike.js";
+import { isUserRestricted } from "./groupModerationController.js";
+import { cleanText, isProfane } from "../config/profanity.js"; 
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -16,7 +20,46 @@ const isAdminOrCreator = (group, userId) =>
   group.members.some(
     (m) => m.user.toString() === userId && m.role === "admin"
   );
-
+const checkAndHandleProfanity = async (content, userId, groupId) => {
+  if (!content) return { allowed: true };
+  
+  const settings = await GroupSettings.getOrCreate(groupId);
+  
+  if (!settings.moderation.profanityFilterEnabled) {
+    return { allowed: true };
+  }
+  
+  const isContentProfane = isProfane(content);
+  
+  if (isContentProfane) {
+    // Log the profanity attempt
+    await ProfanityLog.incrementCount(userId, groupId);
+    const profanityCount = await ProfanityLog.getCount(userId, groupId);
+    
+    // Check if user has warnings
+    const warningCount = await Strike.countDocuments({
+      userId,
+      groupId,
+      type: "warning",
+      isActive: true,
+      expiresAt: { $gt: new Date() }
+    });
+    
+    const warningsBeforeBan = settings.moderation.warningsBeforeBan;
+    const warningsLeft = Math.max(0, warningsBeforeBan - warningCount);
+    
+    return {
+      allowed: false,
+      profanityCount,
+      warningCount,
+      warningsLeft,
+      warningsBeforeBan,
+      message: `⚠️ Warning: Profanity detected. You have ${warningsLeft} warning${warningsLeft !== 1 ? "s" : ""} left before ban.`,
+    };
+  }
+  
+  return { allowed: true };
+};
 const getFileType = (mimeType) => {
   if (!mimeType) return "other";
   if (mimeType.startsWith("image/")) return "image";
@@ -151,23 +194,63 @@ export const sendMessage = async (req, res) => {
   try {
     const { content, replyTo } = req.body;
     const file = req.file;
+    const { id: groupId } = req.params;
+    const userId = req.user.id;
 
-    if (!content?.trim() && !file)
+    // Check if user is banned/muted
+    const restriction = await isUserRestricted(groupId, userId);
+    if (restriction.restricted) {
+      let message = "";
+      if (restriction.type === "temporary_mute") {
+        message = `You are muted until ${new Date(restriction.expiresAt).toLocaleString()}. Reason: ${restriction.reason}`;
+      } else if (restriction.type === "temporary_ban") {
+        message = `You are temporarily banned until ${new Date(restriction.expiresAt).toLocaleString()}. Reason: ${restriction.reason}`;
+      } else if (restriction.type === "permanent_ban") {
+        message = `You are permanently banned from this group. Reason: ${restriction.reason}`;
+      }
+      return res.status(403).json({
+        success: false,
+        message,
+        restriction: true,
+      });
+    }
+
+    // Check message content for profanity
+    if (content?.trim()) {
+      const profanityCheck = await checkAndHandleProfanity(content, userId, groupId);
+      
+      if (!profanityCheck.allowed) {
+        return res.status(403).json({
+          success: false,
+          message: profanityCheck.message,
+          profanityDetected: true,
+          profanityCount: profanityCheck.profanityCount,
+          warningsLeft: profanityCheck.warningsLeft,
+          warningCount: profanityCheck.warningCount,
+          warningsBeforeBan: profanityCheck.warningsBeforeBan,
+        });
+      }
+    }
+
+    if (!content?.trim() && !file) {
       return res.status(400).json({
         success: false,
         message: "Message must have text or a file",
       });
+    }
 
-    const group = await Group.findById(req.params.id);
-    if (!group)
+    const group = await Group.findById(groupId);
+    if (!group) {
       return res.status(404).json({ success: false, message: "Group not found" });
-    if (!isMember(group, req.user.id))
+    }
+    if (!isMember(group, userId)) {
       return res.status(403).json({ success: false, message: "Members only" });
+    }
 
     // Validate replyTo
     if (replyTo) {
       const parent = await Message.findById(replyTo);
-      if (!parent || parent.group.toString() !== req.params.id) {
+      if (!parent || parent.group.toString() !== groupId) {
         return res.status(400).json({
           success: false,
           message: "Invalid reply target",
@@ -175,7 +258,7 @@ export const sendMessage = async (req, res) => {
       }
     }
 
-    // Clean text content
+    // Clean text content (already checked profanity, but clean anyway)
     const cleanedContent = content?.trim() ? cleanText(content.trim()) : "";
 
     // Build file object if file uploaded
@@ -192,20 +275,20 @@ export const sendMessage = async (req, res) => {
     }
 
     const message = await Message.create({
-      group: req.params.id,
-      sender: req.user.id,
+      group: groupId,
+      sender: userId,
       content: cleanedContent,
       file: fileData,
       replyTo: replyTo || null,
       messageType: file ? "file" : "text",
-      readBy: [req.user.id] // Sender has read their own message
+      readBy: [userId],
     });
 
     // If file uploaded, also save to resources automatically
     if (file && fileData) {
       await Resource.create({
-        group: req.params.id,
-        uploadedBy: req.user.id,
+        group: groupId,
+        uploadedBy: userId,
         title: file.originalname,
         description: `Shared in chat`,
         type: fileData.fileType === "image" ? "link" : "link",
@@ -228,6 +311,7 @@ export const sendMessage = async (req, res) => {
 
     res.status(201).json({ success: true, data: populated });
   } catch (error) {
+    console.error("Error sending message:", error);
     res.status(500).json({
       success: false,
       message: "Failed to send message",
@@ -480,3 +564,7 @@ export const markAnnouncementsRead = async (req, res) => {
     });
   }
 };
+
+
+
+

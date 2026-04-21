@@ -1,6 +1,6 @@
 // frontend/src/components/community/JoinGroupModal.jsx
 import React, { useState } from "react";
-import { X, LogIn, KeyRound } from "lucide-react";
+import { X, LogIn, KeyRound, Loader2 } from "lucide-react";
 import axios from "axios";
 
 const JoinGroupModal = ({ onClose, onSuccess }) => {
@@ -59,7 +59,9 @@ const JoinGroupModal = ({ onClose, onSuccess }) => {
               type="text"
               value={inviteCode}
               onChange={(e) => setInviteCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ""))}
-              required maxLength={8} autoFocus
+              required
+              maxLength={8}
+              autoFocus
               className="w-full px-4 py-4 border-2 border-gray-200 rounded-2xl outline-none text-center text-2xl font-mono tracking-[0.4em] font-bold text-indigo-700 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all bg-indigo-50/30 placeholder:text-gray-300 placeholder:text-lg placeholder:tracking-widest placeholder:font-normal"
               placeholder="XXXXXXXX"
             />
@@ -79,7 +81,8 @@ const JoinGroupModal = ({ onClose, onSuccess }) => {
 
           <div className="flex gap-3">
             <button
-              type="button" onClick={onClose}
+              type="button"
+              onClick={onClose}
               className="flex-1 px-4 py-2.5 border border-gray-200 text-gray-600 rounded-xl hover:bg-gray-50 transition text-sm font-medium cursor-pointer"
             >
               Cancel
@@ -89,8 +92,17 @@ const JoinGroupModal = ({ onClose, onSuccess }) => {
               disabled={loading || inviteCode.length !== 8}
               className="flex-1 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed active:scale-95 cursor-pointer shadow-md flex items-center justify-center gap-2"
             >
-              <LogIn size={15} />
-              {loading ? "Joining..." : "Join Group"}
+              {loading ? (
+                <>
+                  <Loader2 size={15} className="animate-spin" />
+                  Joining...
+                </>
+              ) : (
+                <>
+                  <LogIn size={15} />
+                  Join Group
+                </>
+              )}
             </button>
           </div>
         </form>

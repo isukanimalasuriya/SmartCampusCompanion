@@ -1,41 +1,20 @@
 // frontend/src/components/community/CreateGroupModal.jsx
 import React, { useState, useEffect } from "react";
 import {
-  X,
-  Users,
-  BookOpen,
-  Tag,
-  AlignLeft,
-  Hash,
-  Globe,
-  Lock,
-  ChevronDown,
-  Check,
-  Plus,
+  X, Users, BookOpen, Tag, AlignLeft, Hash, Globe, Lock,
+  ChevronDown, Check, Plus, Loader2
 } from "lucide-react";
 import axios from "axios";
 
 const CATEGORIES = [
-  "General Discussion",
-  "Exams",
-  "Mid Exam",
-  "Final Exam",
-  "Lab Test",
-  "Viva",
-  "Research",
-  "Assignment Help",
-  "Project Collaboration",
+  "General Discussion", "Exams", "Mid Exam", "Final Exam",
+  "Lab Test", "Viva", "Research", "Assignment Help", "Project Collaboration",
 ];
 
 const CreateGroupModal = ({ onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
-    name: "",
-    course: "",
-    topic: "",
-    description: "",
-    category: "General Discussion",
-    isPublic: true,
-    maxMembers: 50,
+    name: "", course: "", topic: "", description: "",
+    category: "General Discussion", isPublic: true, maxMembers: 50,
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -43,36 +22,25 @@ const CreateGroupModal = ({ onClose, onSuccess }) => {
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const token = localStorage.getItem("token");
 
-  // Handle escape key press
   useEffect(() => {
-    const handleEsc = (e) => {
-      if (e.key === "Escape") handleClose();
-    };
+    const handleEsc = (e) => { if (e.key === "Escape") handleClose(); };
     window.addEventListener("keydown", handleEsc);
     return () => window.removeEventListener("keydown", handleEsc);
   }, []);
 
-  // Prevent body scroll when modal is open
   useEffect(() => {
     document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = "unset";
-    };
+    return () => { document.body.style.overflow = "unset"; };
   }, []);
 
   const handleClose = () => {
     setIsClosing(true);
-    setTimeout(() => {
-      onClose();
-    }, 200);
+    setTimeout(() => onClose(), 200);
   };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData((p) => ({
-      ...p,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+    setFormData((p) => ({ ...p, [name]: type === "checkbox" ? checked : value }));
   };
 
   const handleSubmit = async (e) => {
@@ -80,16 +48,9 @@ const CreateGroupModal = ({ onClose, onSuccess }) => {
     setLoading(true);
     setError("");
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/groups",
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        },
-      );
+      const res = await axios.post("http://localhost:5000/api/groups", formData, {
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      });
       if (res.data.success) {
         handleClose();
         onSuccess();
@@ -108,7 +69,6 @@ const CreateGroupModal = ({ onClose, onSuccess }) => {
 
   return (
     <>
-      {/* Backdrop */}
       <div
         className={`fixed inset-0 bg-black/50 backdrop-blur-sm z-50 transition-all duration-200 ${
           isClosing ? "opacity-0" : "opacity-100"
@@ -116,14 +76,13 @@ const CreateGroupModal = ({ onClose, onSuccess }) => {
         onClick={handleClose}
       />
 
-      {/* Modal */}
       <div
         className={`fixed inset-0 flex items-center justify-center z-50 p-4 transition-all duration-200 ${
           isClosing ? "opacity-0 scale-95" : "opacity-100 scale-100"
         }`}
       >
         <div className="font-poppins bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden">
-          {/* Header with gradient background */}
+          {/* Header */}
           <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-6 text-white shrink-0">
             <div className="flex justify-between items-start">
               <div>
@@ -135,16 +94,13 @@ const CreateGroupModal = ({ onClose, onSuccess }) => {
                   Set up your group and invite members to collaborate
                 </p>
               </div>
-              <button
-                onClick={handleClose}
-                className="p-1.5 rounded-xl hover:bg-white/20 transition cursor-pointer"
-              >
+              <button onClick={handleClose} className="p-1.5 rounded-xl hover:bg-white/20 transition cursor-pointer">
                 <X size={18} />
               </button>
             </div>
           </div>
 
-          {/* Form - Scrollable area */}
+          {/* Form */}
           <div className="flex-1 overflow-y-auto px-6 py-6">
             <form onSubmit={handleSubmit} className="space-y-5">
               {error && (
@@ -159,10 +115,7 @@ const CreateGroupModal = ({ onClose, onSuccess }) => {
                   Group Name <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
-                  <Hash
-                    size={16}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                  />
+                  <Hash size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                   <input
                     type="text"
                     name="name"
@@ -182,10 +135,7 @@ const CreateGroupModal = ({ onClose, onSuccess }) => {
                     Course <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
-                    <BookOpen
-                      size={16}
-                      className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                    />
+                    <BookOpen size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                     <input
                       type="text"
                       name="course"
@@ -219,28 +169,16 @@ const CreateGroupModal = ({ onClose, onSuccess }) => {
                   Category <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
-                  <Tag
-                    size={16}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
-                  />
+                  <Tag size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
                   <button
                     type="button"
-                    onClick={() =>
-                      setShowCategoryDropdown(!showCategoryDropdown)
-                    }
+                    onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
                     className="w-full pl-10 pr-10 py-2.5 border border-gray-200 rounded-xl text-sm text-left bg-gray-50 hover:bg-white focus:bg-white transition-all duration-200 cursor-pointer flex items-center justify-between"
                   >
-                    <span
-                      className={
-                        formData.category ? "text-gray-900" : "text-gray-500"
-                      }
-                    >
+                    <span className={formData.category ? "text-gray-900" : "text-gray-500"}>
                       {formData.category || "Select category"}
                     </span>
-                    <ChevronDown
-                      size={16}
-                      className={`text-gray-400 transition-transform duration-200 ${showCategoryDropdown ? "rotate-180" : ""}`}
-                    />
+                    <ChevronDown size={16} className={`text-gray-400 transition-transform duration-200 ${showCategoryDropdown ? "rotate-180" : ""}`} />
                   </button>
 
                   {showCategoryDropdown && (
@@ -253,9 +191,7 @@ const CreateGroupModal = ({ onClose, onSuccess }) => {
                           className="w-full px-4 py-2.5 text-left text-sm hover:bg-gray-50 transition-colors flex items-center justify-between group"
                         >
                           <span className="text-gray-700">{category}</span>
-                          {formData.category === category && (
-                            <Check size={14} className="text-indigo-600" />
-                          )}
+                          {formData.category === category && <Check size={14} className="text-indigo-600" />}
                         </button>
                       ))}
                     </div>
@@ -269,10 +205,7 @@ const CreateGroupModal = ({ onClose, onSuccess }) => {
                   Description
                 </label>
                 <div className="relative">
-                  <AlignLeft
-                    size={16}
-                    className="absolute left-3 top-3 text-gray-400"
-                  />
+                  <AlignLeft size={16} className="absolute left-3 top-3 text-gray-400" />
                   <textarea
                     name="description"
                     value={formData.description}
@@ -291,10 +224,7 @@ const CreateGroupModal = ({ onClose, onSuccess }) => {
                     Max Members
                   </label>
                   <div className="relative">
-                    <Users
-                      size={16}
-                      className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                    />
+                    <Users size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                     <input
                       type="number"
                       name="maxMembers"
@@ -314,9 +244,7 @@ const CreateGroupModal = ({ onClose, onSuccess }) => {
                   </label>
                   <button
                     type="button"
-                    onClick={() =>
-                      setFormData((p) => ({ ...p, isPublic: !p.isPublic }))
-                    }
+                    onClick={() => setFormData((p) => ({ ...p, isPublic: !p.isPublic }))}
                     className="w-full py-2.5 px-3 rounded-xl border text-sm font-medium transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 hover:shadow-sm"
                   >
                     {formData.isPublic ? (
@@ -332,16 +260,14 @@ const CreateGroupModal = ({ onClose, onSuccess }) => {
                     )}
                   </button>
                   <p className="text-xs text-gray-400 mt-1 text-center">
-                    {formData.isPublic
-                      ? "Anyone can discover and join"
-                      : "Invite only via code"}
+                    {formData.isPublic ? "Anyone can discover and join" : "Invite only via code"}
                   </p>
                 </div>
               </div>
             </form>
           </div>
 
-          {/* Footer - Fixed at bottom */}
+          {/* Footer */}
           <div className="px-6 py-4 border-t border-gray-100 bg-white shrink-0">
             <div className="flex gap-3">
               <button
@@ -355,13 +281,13 @@ const CreateGroupModal = ({ onClose, onSuccess }) => {
                 type="submit"
                 onClick={handleSubmit}
                 disabled={loading}
-                className="flex-1 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-sm hover:shadow-md"
+                className="flex-1 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-sm hover:shadow-md flex items-center justify-center gap-2"
               >
                 {loading ? (
-                  <div className="flex items-center justify-center gap-2">
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <>
+                    <Loader2 size={16} className="animate-spin" />
                     <span>Creating...</span>
-                  </div>
+                  </>
                 ) : (
                   "Create Group"
                 )}

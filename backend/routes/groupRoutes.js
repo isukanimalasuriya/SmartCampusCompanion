@@ -13,6 +13,18 @@ import {
   markMessagesAsRead,  // ← ADD THIS IMPORT
 } from "../controllers/groupDetailController.js";
 
+import {
+  giveWarning,
+  applyMute,
+  applyTempBan,
+  applyPermanentBan,
+  removeStrike,
+  getUserStrikes,
+  getGroupViolations,
+  updateModerationSettings,
+  getModerationSettings,
+} from "../controllers/groupModerationController.js";
+
 const router = Router();
 
 // In-memory typing store
@@ -74,5 +86,14 @@ router.get("/:id/announcements", auth, getAnnouncements);
 router.post("/:id/announcements", auth, createAnnouncement);
 router.delete("/:id/announcements/:announcementId", auth, deleteAnnouncement);
 router.post("/:id/announcements/read", auth, markAnnouncementsRead);
+router.post("/:groupId/moderation/warning", auth, giveWarning);
+router.post("/:groupId/moderation/mute", auth, applyMute);
+router.post("/:groupId/moderation/temp-ban", auth, applyTempBan);
+router.post("/:groupId/moderation/permanent-ban", auth, applyPermanentBan);
+router.delete("/:groupId/moderation/strike/:strikeId", auth, removeStrike);
+router.get("/:groupId/moderation/strikes/:userId", auth, getUserStrikes);
+router.get("/:groupId/moderation/violations", auth, getGroupViolations);
+router.get("/:groupId/moderation/settings", auth, getModerationSettings);
+router.put("/:groupId/moderation/settings", auth, updateModerationSettings);
 
 export default router;
