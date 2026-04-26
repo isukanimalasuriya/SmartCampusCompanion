@@ -136,7 +136,7 @@ const ProfanityWarning = ({ warning, onDismiss }) => {
   );
 };
 
-// ─── MAIN COMPONENT ──────────────────────────────────────────────────────────
+// MAIN COMPONENT 
 const GroupDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -523,7 +523,7 @@ const GroupDetail = () => {
             </div>
           )}
 
-          {/* ── COMPACT HERO HEADER ──────────────────────────────────────── */}
+          {/* COMPACT HERO HEADER */}
           <section className="bg-white rounded-2xl border border-gray-200/80 shadow-sm overflow-hidden">
             <div className="h-1 bg-gradient-to-r from-violet-500 via-indigo-500 to-purple-500" />
 
@@ -612,7 +612,7 @@ const GroupDetail = () => {
             </div>
           </section>
 
-          {/* ── TABS + CONTENT ───────────────────────────────────────────── */}
+          {/*TABS + CONTENT*/}
           <div className="bg-white rounded-3xl border border-gray-200/80 shadow-sm overflow-hidden">
             <div className="flex border-b border-gray-100 overflow-x-auto scrollbar-hide px-2 pt-2">
               {tabs.map(({ key, label, icon: Icon, badge }) => (
@@ -633,7 +633,7 @@ const GroupDetail = () => {
               ))}
             </div>
 
-            {/* ── OVERVIEW ─────────────────────────────────────── */}
+            {/*OVERVIEW */}
             {activeTab === "overview" && (
               <div className="p-6 animate-in fade-in duration-300">
                 {isMember ? (
@@ -687,7 +687,7 @@ const GroupDetail = () => {
               </div>
             )}
 
-            {/* ── CHAT ─────────────────────────────────────────── */}
+            {/*  CHAT*/}
             {activeTab === "chat" && isMember && (
               <div className="flex flex-col" style={{ height: "600px" }}>
                 {/* Messages */}
@@ -845,7 +845,7 @@ const GroupDetail = () => {
               </div>
             )}
 
-            {/* ── RESOURCES ────────────────────────────────────── */}
+            {/* RESOURCES */}
             {activeTab === "resources" && isMember && (
               <div className="p-6 space-y-5 animate-in fade-in duration-300">
                 <div className="flex justify-between items-center">
@@ -922,7 +922,7 @@ const GroupDetail = () => {
               </div>
             )}
 
-            {/* ── ANNOUNCEMENTS ─────────────────────────────────── */}
+            {/* ANNOUNCEMENTS*/}
             {activeTab === "announcements" && (
               <div className="p-6 space-y-5 animate-in fade-in duration-300">
                 <div className="flex justify-between items-center">
@@ -1006,7 +1006,7 @@ const GroupDetail = () => {
               </div>
             )}
 
-            {/* ── MODERATION ────────────────────────────────────── */}
+            {/* MODERATION */}
             {activeTab === "moderation" && isOwner && (
               <div className="p-6 animate-in fade-in duration-300">
                 <div className="flex gap-2 border-b border-gray-100 mb-6">

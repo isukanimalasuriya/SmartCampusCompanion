@@ -30,7 +30,7 @@ const router = Router();
 // In-memory typing store
 const typingStore = {};
 
-// ── Group CRUD ────────────────────────────────────────────────────────────────
+// Group CRUD 
 router.post("/", auth, createGroup);
 router.post("/join", auth, joinGroupByCode);
 router.get("/my-groups", auth, getMyGroups);
@@ -42,14 +42,14 @@ router.post("/:id/leave", auth, leaveGroup);
 router.get("/:id/members", auth, getGroupMembers);
 router.put("/:groupId/members/:userId/role", auth, updateUserRole);
 
-// ── Messages ──────────────────────────────────────────────────────────────────
+//  Messages 
 router.get("/:id/messages", auth, getMessages);
 router.get("/:id/messages/count", auth, getMessageCount);
 router.post("/:id/messages", auth, uploadSingle("file"), sendMessage);
 router.delete("/:id/messages/:messageId", auth, deleteMessage);
 router.post("/:id/messages/read", auth, markMessagesAsRead);
 
-// ── User Restriction Status (Mute/Ban check) ─────────────────────────────────
+//User Restriction Status (Mute/Ban check) 
 router.get("/:id/user-restriction", auth, async (req, res) => {
   try {
     const restriction = await isUserRestricted(req.params.id, req.user.id);
@@ -60,7 +60,7 @@ router.get("/:id/user-restriction", auth, async (req, res) => {
   }
 });
 
-// ── Typing ────────────────────────────────────────────────────────────────────
+// Typing 
 router.get("/:id/typing", auth, (req, res) => {
   const now = Date.now();
   const store = typingStore[req.params.id] || {};
@@ -88,18 +88,18 @@ router.post("/:id/typing", auth, async (req, res) => {
   res.json({ success: true });
 });
 
-// ── Resources ─────────────────────────────────────────────────────────────────
+//Resources 
 router.get("/:id/resources", auth, getResources);
 router.post("/:id/resources", auth, addResource);
 router.delete("/:id/resources/:resourceId", auth, deleteResource);
 
-// ── Announcements ─────────────────────────────────────────────────────────────
+//Announcements
 router.get("/:id/announcements", auth, getAnnouncements);
 router.post("/:id/announcements", auth, createAnnouncement);
 router.delete("/:id/announcements/:announcementId", auth, deleteAnnouncement);
 router.post("/:id/announcements/read", auth, markAnnouncementsRead);
 
-// ── Moderation & Warnings ────────────────────────────────────────────────────
+//Moderation & Warnings
 router.post("/:groupId/moderation/warning", auth, giveWarning);
 router.post("/:groupId/moderation/mute", auth, applyMute);
 router.post("/:groupId/moderation/temp-ban", auth, applyTempBan);

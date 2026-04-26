@@ -15,7 +15,7 @@ export const createGroup = async (req, res) => {
       creatorRole: "admin",
       isPublic: isPublic !== undefined ? isPublic : true,
       maxMembers: maxMembers || 50,
-      // ✅ Removed inviteCode here — pre-save hook handles it
+      //  Removed inviteCode here — pre-save hook handles it
       members: [{ 
         user: userId, 
         role: "admin",

@@ -10,7 +10,7 @@ import Strike from "../models/Strike.js";
 import { isUserRestricted } from "./groupModerationController.js";
 import { cleanText, isProfane } from "../config/profanity.js";
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
+// Helpers
 
 const isMember = (group, userId) =>
   group.members.some((m) => m.user.toString() === userId);
@@ -89,7 +89,7 @@ const getFileType = (mimeType) => {
   return "other";
 };
 
-// ── Messages ──────────────────────────────────────────────────────────────────
+// Messages 
 
 export const getMessages = async (req, res) => {
   try {
@@ -381,7 +381,7 @@ export const deleteMessage = async (req, res) => {
   }
 };
 
-// ── Resources ─────────────────────────────────────────────────────────────────
+// Resources 
 
 export const getResources = async (req, res) => {
   try {
@@ -476,7 +476,7 @@ export const deleteResource = async (req, res) => {
   }
 };
 
-// ── Announcements ─────────────────────────────────────────────────────────────
+// Announcements
 
 export const getAnnouncements = async (req, res) => {
   try {

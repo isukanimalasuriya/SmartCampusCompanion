@@ -89,7 +89,7 @@ groupSchema.methods.addMember = function (userId, role = "member") {
   this.members.push({ user: userId, role, joinedAt: new Date() });
 };
 
-// ✅ FIX: Check if model already exists before creating
+// Check if model already exists before creating
 const Group = mongoose.models.Group || mongoose.model("Group", groupSchema);
 
 export default Group;

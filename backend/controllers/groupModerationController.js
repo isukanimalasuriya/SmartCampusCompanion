@@ -50,9 +50,8 @@ const checkAndApplyAutoBan = async (userId, groupId, issuedBy) => {
   return { banned: false };
 };
 
-// ──────────────────────────────────────────────────────────────────────────────
+
 // 1. Give Warning
-// ──────────────────────────────────────────────────────────────────────────────
 export const giveWarning = async (req, res) => {
   try {
     const { userId, reason } = req.body;
@@ -113,9 +112,9 @@ export const giveWarning = async (req, res) => {
   }
 };
 
-// ──────────────────────────────────────────────────────────────────────────────
+
 // 2. Apply Mute
-// ──────────────────────────────────────────────────────────────────────────────
+
 export const applyMute = async (req, res) => {
   try {
     const { userId, durationMinutes, reason } = req.body;
@@ -159,9 +158,8 @@ export const applyMute = async (req, res) => {
   }
 };
 
-// ──────────────────────────────────────────────────────────────────────────────
+
 // 3. Apply Temporary Ban
-// ──────────────────────────────────────────────────────────────────────────────
 export const applyTempBan = async (req, res) => {
   try {
     const { userId, durationHours, reason } = req.body;
@@ -205,9 +203,8 @@ export const applyTempBan = async (req, res) => {
   }
 };
 
-// ──────────────────────────────────────────────────────────────────────────────
+
 // 4. Apply Permanent Ban
-// ──────────────────────────────────────────────────────────────────────────────
 export const applyPermanentBan = async (req, res) => {
   try {
     const { userId, reason } = req.body;
@@ -254,9 +251,8 @@ export const applyPermanentBan = async (req, res) => {
   }
 };
 
-// ──────────────────────────────────────────────────────────────────────────────
+
 // 5. Remove Strike (Unban/Unmute)
-// ──────────────────────────────────────────────────────────────────────────────
 export const removeStrike = async (req, res) => {
   try {
     const { strikeId } = req.params;
@@ -295,9 +291,8 @@ export const removeStrike = async (req, res) => {
   }
 };
 
-// ──────────────────────────────────────────────────────────────────────────────
+
 // 6. Get User Strikes
-// ──────────────────────────────────────────────────────────────────────────────
 export const getUserStrikes = async (req, res) => {
   try {
     const { groupId, userId } = req.params;
@@ -341,9 +336,8 @@ export const getUserStrikes = async (req, res) => {
   }
 };
 
-// ──────────────────────────────────────────────────────────────────────────────
+
 // 7. Get All Group Violations (Admin Dashboard)
-// ──────────────────────────────────────────────────────────────────────────────
 export const getGroupViolations = async (req, res) => {
   try {
     const { groupId } = req.params;
@@ -426,9 +420,7 @@ export const getGroupViolations = async (req, res) => {
   }
 };
 
-// ──────────────────────────────────────────────────────────────────────────────
 // 8. Update Group Moderation Settings
-// ──────────────────────────────────────────────────────────────────────────────
 export const updateModerationSettings = async (req, res) => {
   try {
     const { groupId } = req.params;
@@ -466,9 +458,8 @@ export const updateModerationSettings = async (req, res) => {
   }
 };
 
-// ──────────────────────────────────────────────────────────────────────────────
+
 // 9. Get Moderation Settings
-// ──────────────────────────────────────────────────────────────────────────────
 export const getModerationSettings = async (req, res) => {
   try {
     const { groupId } = req.params;
@@ -497,9 +488,7 @@ export const getModerationSettings = async (req, res) => {
   }
 };
 
-// ──────────────────────────────────────────────────────────────────────────────
 // 10. Check if User is Banned/Muted (Middleware helper)
-// ──────────────────────────────────────────────────────────────────────────────
 export const isUserRestricted = async (groupId, userId) => {
   const now = new Date();
   
