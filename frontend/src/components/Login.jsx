@@ -66,10 +66,12 @@ export default function Login() {
         .slice(0, 2);
       setUser({ ...mappedUser, avatar: initials });
 
-      // Store role in localStorage
+      // Store role and userId in localStorage
       if (userData.role) {
         localStorage.setItem("role", userData.role);
       }
+      localStorage.setItem("userId", userData.id || userData._id);
+
 
       // Redirect based on role
       const dashboardPath = userData.role === "admin" ? "/admin/dashboard" : "/dashboard";
