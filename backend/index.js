@@ -12,6 +12,8 @@ import ticketRoutes from "./routes/ticketRoutes.js";
 import aiRoutes from "./routes/aiRoutes.js";
 import adminTicketRoutes from "./routes/adminTicketRoutes.js";
 import adminSpaceRoutes from "./routes/adminSpaceRoutes.js";
+import { startAutoCheckoutJob } from "./jobs/autoCheckoutJob.js";
+
 
 import { errorHandler } from "./middleware/errorHandler.js";
 import cors from "cors";
@@ -22,6 +24,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 connectDB();
+startAutoCheckoutJob();
+
 
 const app = express();
 const server = http.createServer(app);

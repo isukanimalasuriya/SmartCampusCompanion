@@ -292,7 +292,14 @@ export default function StudyAreas() {
   useEffect(() => {
     loadSpaces();
     loadActiveBooking();
+
+    // Join user room for targeted notifications
+    const userId = localStorage.getItem("userId"); // Assuming userId is stored
+    if (userId) {
+      socket.emit("join_user_room", userId);
+    }
   }, []);
+
 
   /* Load tables for a space */
   const fetchTables = async (spaceId) => {
@@ -412,8 +419,21 @@ export default function StudyAreas() {
         }),
       );
     });
-    return () => socket.off("seatUpdated");
+
+    socket.on("auto_checkout", ({ message }) => {
+      toast.info(message);
+      setActiveBooking(null);
+      loadSpaces();
+      if (selectedArea) fetchTables(selectedArea._id);
+    });
+
+    return () => {
+      socket.off("seatUpdated");
+      socket.off("auto_checkout");
+    };
   }, [selectedArea]);
+
+
 
   /* Filtered spaces */
   const filtered = areas.filter(
