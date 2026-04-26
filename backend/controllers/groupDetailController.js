@@ -8,7 +8,7 @@ import ProfanityLog from "../models/ProfanityLog.js";
 import GroupSettings from "../models/GroupSettings.js";
 import Strike from "../models/Strike.js";
 import { isUserRestricted } from "./groupModerationController.js";
-import { cleanText, isProfane } from "../config/profanity.js"; 
+import { cleanText, isProfane } from "../config/profanity.js";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -20,7 +20,13 @@ const isAdminOrCreator = (group, userId) =>
   group.members.some(
     (m) => m.user.toString() === userId && m.role === "admin"
   );
-const checkAndHandleProfanity = async (content, userId, groupId) => {
+
+const isGroupOwner = async (groupId, userId) => {
+  const group = await Group.findById(groupId);
+  return group && group.creator.toString() === userId.toString();
+};
+
+const checkAndHandleProfanity = async (content, userId, groupId, isOwner = false) => {
   if (!content) return { allowed: true };
   
   const settings = await GroupSettings.getOrCreate(groupId);
@@ -32,11 +38,16 @@ const checkAndHandleProfanity = async (content, userId, groupId) => {
   const isContentProfane = isProfane(content);
   
   if (isContentProfane) {
-    // Log the profanity attempt
+    // For owners, just replace with asterisks, no warning
+    if (isOwner) {
+      const cleanContent = cleanText(content);
+      return { allowed: true, cleanedContent: cleanContent };
+    }
+    
+    // For regular users, block and warn
     await ProfanityLog.incrementCount(userId, groupId);
     const profanityCount = await ProfanityLog.getCount(userId, groupId);
     
-    // Check if user has warnings
     const warningCount = await Strike.countDocuments({
       userId,
       groupId,
@@ -60,6 +71,7 @@ const checkAndHandleProfanity = async (content, userId, groupId) => {
   
   return { allowed: true };
 };
+
 const getFileType = (mimeType) => {
   if (!mimeType) return "other";
   if (mimeType.startsWith("image/")) return "image";
@@ -129,7 +141,6 @@ export const getMessages = async (req, res) => {
   }
 };
 
-// UPDATED: Now returns UNREAD message count
 export const getMessageCount = async (req, res) => {
   try {
     const group = await Group.findById(req.params.id);
@@ -138,11 +149,10 @@ export const getMessageCount = async (req, res) => {
     if (!isMember(group, req.user.id))
       return res.status(403).json({ success: false, message: "Members only" });
 
-    // Count unread messages (messages not read by the current user)
     const unreadCount = await Message.countDocuments({
       group: req.params.id,
       deleted: false,
-      readBy: { $ne: req.user.id } // User hasn't read this message
+      readBy: { $ne: req.user.id }
     });
 
     res.status(200).json({ success: true, count: unreadCount });
@@ -155,7 +165,6 @@ export const getMessageCount = async (req, res) => {
   }
 };
 
-// NEW: Mark messages as read
 export const markMessagesAsRead = async (req, res) => {
   try {
     const group = await Group.findById(req.params.id);
@@ -164,7 +173,6 @@ export const markMessagesAsRead = async (req, res) => {
     if (!isMember(group, req.user.id))
       return res.status(403).json({ success: false, message: "Members only" });
 
-    // Mark all unread messages as read for this user
     const result = await Message.updateMany(
       {
         group: req.params.id,
@@ -197,27 +205,39 @@ export const sendMessage = async (req, res) => {
     const { id: groupId } = req.params;
     const userId = req.user.id;
 
-    // Check if user is banned/muted
-    const restriction = await isUserRestricted(groupId, userId);
-    if (restriction.restricted) {
-      let message = "";
-      if (restriction.type === "temporary_mute") {
-        message = `You are muted until ${new Date(restriction.expiresAt).toLocaleString()}. Reason: ${restriction.reason}`;
-      } else if (restriction.type === "temporary_ban") {
-        message = `You are temporarily banned until ${new Date(restriction.expiresAt).toLocaleString()}. Reason: ${restriction.reason}`;
-      } else if (restriction.type === "permanent_ban") {
-        message = `You are permanently banned from this group. Reason: ${restriction.reason}`;
-      }
-      return res.status(403).json({
-        success: false,
-        message,
-        restriction: true,
-      });
+    // Get group to check if user is owner
+    const group = await Group.findById(groupId);
+    if (!group) {
+      return res.status(404).json({ success: false, message: "Group not found" });
     }
 
+    const isOwner = group.creator.toString() === userId;
+
+    // Check if user is banned/muted (skip for owner)
+    if (!isOwner) {
+      const restriction = await isUserRestricted(groupId, userId);
+      if (restriction.restricted) {
+        let message = "";
+        if (restriction.type === "temporary_mute") {
+          message = `You are muted until ${new Date(restriction.expiresAt).toLocaleString()}. Reason: ${restriction.reason}`;
+        } else if (restriction.type === "temporary_ban") {
+          message = `You are temporarily banned until ${new Date(restriction.expiresAt).toLocaleString()}. Reason: ${restriction.reason}`;
+        } else if (restriction.type === "permanent_ban") {
+          message = `You are permanently banned from this group. Reason: ${restriction.reason}`;
+        }
+        return res.status(403).json({
+          success: false,
+          message,
+          restriction: true,
+        });
+      }
+    }
+
+    let finalContent = content?.trim() || "";
+
     // Check message content for profanity
-    if (content?.trim()) {
-      const profanityCheck = await checkAndHandleProfanity(content, userId, groupId);
+    if (finalContent) {
+      const profanityCheck = await checkAndHandleProfanity(finalContent, userId, groupId, isOwner);
       
       if (!profanityCheck.allowed) {
         return res.status(403).json({
@@ -230,20 +250,21 @@ export const sendMessage = async (req, res) => {
           warningsBeforeBan: profanityCheck.warningsBeforeBan,
         });
       }
+      
+      // If owner and profanity was cleaned, use cleaned version
+      if (profanityCheck.cleanedContent) {
+        finalContent = profanityCheck.cleanedContent;
+      }
     }
 
-    if (!content?.trim() && !file) {
+    if (!finalContent && !file) {
       return res.status(400).json({
         success: false,
         message: "Message must have text or a file",
       });
     }
 
-    const group = await Group.findById(groupId);
-    if (!group) {
-      return res.status(404).json({ success: false, message: "Group not found" });
-    }
-    if (!isMember(group, userId)) {
+    if (!isMember(group, userId) && !isOwner) {
       return res.status(403).json({ success: false, message: "Members only" });
     }
 
@@ -258,8 +279,8 @@ export const sendMessage = async (req, res) => {
       }
     }
 
-    // Clean text content (already checked profanity, but clean anyway)
-    const cleanedContent = content?.trim() ? cleanText(content.trim()) : "";
+    // Clean text content
+    const cleanedContent = finalContent ? cleanText(finalContent) : "";
 
     // Build file object if file uploaded
     let fileData = null;
@@ -334,7 +355,6 @@ export const deleteMessage = async (req, res) => {
     if (!canDelete)
       return res.status(403).json({ success: false, message: "Not authorized" });
 
-    // Delete file from S3 if exists
     if (message.file?.key) {
       try {
         await s3.send(
@@ -348,7 +368,6 @@ export const deleteMessage = async (req, res) => {
       }
     }
 
-    // Soft delete
     message.deleted = true;
     await message.save();
 
@@ -433,7 +452,6 @@ export const deleteResource = async (req, res) => {
     if (!canDelete)
       return res.status(403).json({ success: false, message: "Not authorized" });
 
-    // Delete from S3 if has key
     if (resource.fileKey) {
       try {
         await s3.send(
@@ -564,7 +582,3 @@ export const markAnnouncementsRead = async (req, res) => {
     });
   }
 };
-
-
-
-

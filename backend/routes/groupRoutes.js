@@ -3,16 +3,15 @@ import { auth } from "../middleware/authMiddleware.js";
 import { uploadSingle } from "../config/multer.js";
 import {
   createGroup, getPublicGroups, getGroupById, updateGroup,
-  joinGroupByCode, getMyGroups, deleteGroup, leaveGroup, getGroupMembers,
+  joinGroupByCode, getMyGroups, deleteGroup, leaveGroup, getGroupMembers, updateUserRole
 } from "../controllers/groupController.js";
 import {
   getMessages, sendMessage, deleteMessage, getMessageCount,
   getResources, addResource, deleteResource,
   getAnnouncements, createAnnouncement, deleteAnnouncement,
   markAnnouncementsRead,
-  markMessagesAsRead,  // ← ADD THIS IMPORT
+  markMessagesAsRead, 
 } from "../controllers/groupDetailController.js";
-
 import {
   giveWarning,
   applyMute,
@@ -23,6 +22,7 @@ import {
   getGroupViolations,
   updateModerationSettings,
   getModerationSettings,
+  isUserRestricted,
 } from "../controllers/groupModerationController.js";
 
 const router = Router();
@@ -40,13 +40,25 @@ router.put("/:id", auth, updateGroup);
 router.delete("/:id", auth, deleteGroup);
 router.post("/:id/leave", auth, leaveGroup);
 router.get("/:id/members", auth, getGroupMembers);
+router.put("/:groupId/members/:userId/role", auth, updateUserRole);
 
 // ── Messages ──────────────────────────────────────────────────────────────────
 router.get("/:id/messages", auth, getMessages);
 router.get("/:id/messages/count", auth, getMessageCount);
 router.post("/:id/messages", auth, uploadSingle("file"), sendMessage);
 router.delete("/:id/messages/:messageId", auth, deleteMessage);
-router.post('/:id/messages/read', auth, markMessagesAsRead);  // ← ADD auth middleware
+router.post("/:id/messages/read", auth, markMessagesAsRead);
+
+// ── User Restriction Status (Mute/Ban check) ─────────────────────────────────
+router.get("/:id/user-restriction", auth, async (req, res) => {
+  try {
+    const restriction = await isUserRestricted(req.params.id, req.user.id);
+    res.json(restriction);
+  } catch (error) {
+    console.error("Error checking user restriction:", error);
+    res.status(500).json({ restricted: false, error: error.message });
+  }
+});
 
 // ── Typing ────────────────────────────────────────────────────────────────────
 router.get("/:id/typing", auth, (req, res) => {
@@ -86,6 +98,8 @@ router.get("/:id/announcements", auth, getAnnouncements);
 router.post("/:id/announcements", auth, createAnnouncement);
 router.delete("/:id/announcements/:announcementId", auth, deleteAnnouncement);
 router.post("/:id/announcements/read", auth, markAnnouncementsRead);
+
+// ── Moderation & Warnings ────────────────────────────────────────────────────
 router.post("/:groupId/moderation/warning", auth, giveWarning);
 router.post("/:groupId/moderation/mute", auth, applyMute);
 router.post("/:groupId/moderation/temp-ban", auth, applyTempBan);

@@ -55,7 +55,7 @@ const Navbar = () => {
       
       {/* Logo */}
       <div className="text-xl font-bold text-indigo-600 mb-10 whitespace-nowrap tracking-tight">
-        CampusCompanion
+        Campus Companion
       </div>
 
       {/* Navigation */}

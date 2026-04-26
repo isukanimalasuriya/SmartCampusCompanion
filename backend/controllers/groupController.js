@@ -317,3 +317,47 @@ export const getGroupMembers = async (req, res) => {
     });
   }
 };
+
+// Update user role in group
+export const updateUserRole = async (req, res) => {
+  try {
+    const { groupId, userId } = req.params;
+    const { role } = req.body;
+    const currentUserId = req.user.id;
+
+    const group = await Group.findById(groupId);
+    if (!group) {
+      return res.status(404).json({ success: false, message: "Group not found" });
+    }
+
+    // Check if current user is owner
+    if (group.creator.toString() !== currentUserId) {
+      return res.status(403).json({ success: false, message: "Only group owner can change roles" });
+    }
+
+    // Cannot change owner's role
+    if (group.creator.toString() === userId) {
+      return res.status(400).json({ success: false, message: "Cannot change owner's role" });
+    }
+
+    const member = group.members.find(m => m.user.toString() === userId);
+    if (!member) {
+      return res.status(404).json({ success: false, message: "User is not a member" });
+    }
+
+    member.role = role;
+    await group.save();
+
+    res.status(200).json({
+      success: true,
+      message: `User role updated to ${role}`,
+      data: { userId, role }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to update user role",
+      error: error.message
+    });
+  }
+};
