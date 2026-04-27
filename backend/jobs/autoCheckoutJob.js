@@ -12,13 +12,14 @@ import { io } from "../index.js";
 export const startAutoCheckoutJob = () => {
   cron.schedule("*/5 * * * *", async () => {
     console.log("Running auto-checkout job...");
-    
+
     const threeHoursAgo = new Date(Date.now() - 3 * 60 * 60 * 1000);
-    
+    //const threeHoursAgo = new Date(Date.now() - 2 * 60 * 1000);
+
     try {
       const expiredBookings = await Booking.find({
         status: "ACTIVE",
-        startedAt: { $lt: threeHoursAgo }
+        startedAt: { $lt: threeHoursAgo },
       });
 
       if (expiredBookings.length === 0) {
@@ -26,7 +27,9 @@ export const startAutoCheckoutJob = () => {
         return;
       }
 
-      console.log(`Found ${expiredBookings.length} expired bookings. Processing...`);
+      console.log(
+        `Found ${expiredBookings.length} expired bookings. Processing...`,
+      );
 
       for (const booking of expiredBookings) {
         const session = await mongoose.startSession();
@@ -34,7 +37,9 @@ export const startAutoCheckoutJob = () => {
 
         try {
           const table = await Table.findById(booking.table).session(session);
-          const space = await StudySpace.findById(booking.space).session(session);
+          const space = await StudySpace.findById(booking.space).session(
+            session,
+          );
 
           booking.status = "ENDED";
           booking.endedAt = new Date();
@@ -62,14 +67,17 @@ export const startAutoCheckoutJob = () => {
               availableSeats: table.availableSeats,
             });
           }
-          
+
           // Optionally notify the specific user
           io.to(`user:${booking.user.toString()}`).emit("auto_checkout", {
-            message: "Your study spot booking was automatically checked out after 3 hours.",
-            bookingId: booking._id
+            message:
+              "Your study spot booking was automatically checked out after 3 hours.",
+            bookingId: booking._id,
           });
 
-          console.log(`Auto-checked out booking ${booking._id} for user ${booking.user}`);
+          console.log(
+            `Auto-checked out booking ${booking._id} for user ${booking.user}`,
+          );
         } catch (err) {
           await session.abortTransaction();
           session.endSession();
