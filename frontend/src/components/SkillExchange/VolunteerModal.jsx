@@ -98,9 +98,7 @@ const VolunteerModal = ({ isOpen, onClose, learningRequest, onSuccess }) => {
             </div>
           </div>
 
-          <p className="text-[10px] text-gray-400">
-            Session mode follows the request: <span className="font-bold text-gray-600">{learningRequest.mode}</span>
-          </p>
+
 
           {/* Submit */}
           <button

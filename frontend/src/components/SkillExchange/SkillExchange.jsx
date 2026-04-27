@@ -191,7 +191,7 @@ const SkillExchange = () => {
               Join Meeting Now
             </a>
           )}
-          {mode === "Offline" && <p className="text-xs text-emerald-700">Attend in person at the agreed location.</p>}
+          {/* Offline message removed */}
         </div>,
         { autoClose: 12000 }
       );
@@ -743,12 +743,10 @@ const SkillExchange = () => {
                                 <User size={13} className="text-indigo-500 shrink-0" strokeWidth={2} />
                                 <span className="font-medium text-slate-700 truncate max-w-[9rem] sm:max-w-[11rem]">{skill.providerName}</span>
                               </span>
-                              {skill.mode && (
-                                <span className="inline-flex items-center gap-1.5">
-                                  {skill.mode === "Online" ? <Wifi size={13} className="text-indigo-500 shrink-0" strokeWidth={2} /> : <MapPin size={13} className="text-slate-400 shrink-0" strokeWidth={2} />}
-                                  <span className="font-medium">{skill.mode}</span>
-                                </span>
-                              )}
+                              <span className="inline-flex items-center gap-1.5">
+                                <Wifi size={13} className="text-indigo-500 shrink-0" strokeWidth={2} />
+                                <span className="font-medium">Online</span>
+                              </span>
                               <span className="inline-flex items-center gap-1.5 rounded-lg bg-white px-2 py-0.5 border border-slate-200/90 shadow-sm" title="Host plus approved joiners">
                                 <Users size={13} className="text-indigo-500 shrink-0" strokeWidth={2} />
                                 <span className="font-semibold tabular-nums text-slate-800">{attendanceCount}</span>
@@ -880,8 +878,8 @@ const SkillExchange = () => {
                               <h3 className="text-base font-bold text-gray-900 leading-tight group-hover:text-violet-600 transition-colors truncate">{lr.titleWhatIWantToLearn}</h3>
                               <p className="text-xs font-semibold text-gray-400 truncate">{lr.subject}</p>
                             </div>
-                            <span className={`text-[9px] px-2 py-1 rounded-full font-bold uppercase shrink-0 whitespace-nowrap ${lr.mode === "Online" ? "bg-indigo-50 text-indigo-700" : "bg-emerald-50 text-emerald-700"}`}>
-                              {lr.mode === "Online" ? <span className="flex items-center gap-1"><Wifi size={9} /> Online</span> : <span className="flex items-center gap-1"><MapPin size={9} /> Offline</span>}
+                            <span className="text-[9px] px-2 py-1 rounded-full font-bold uppercase shrink-0 whitespace-nowrap bg-indigo-50 text-indigo-700">
+                              <span className="flex items-center gap-1"><Wifi size={9} /> Online</span>
                             </span>
                           </div>
                           
@@ -1089,7 +1087,7 @@ const SkillExchange = () => {
                                   <Globe size={14} /> Join Meeting
                                 </a>
                               ) : (
-                                <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-4 py-2 rounded-xl border border-emerald-200">Attend in Person ✓</span>
+                                <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-4 py-2 rounded-xl border border-emerald-200">Online Session ✓</span>
                               )
                             ) : myJoin?.status === "Rejected" ? (
                               <span className="text-xs font-bold text-red-500 bg-red-50 px-4 py-2 rounded-xl border border-red-200">Request Rejected</span>
@@ -1216,7 +1214,7 @@ const SkillExchange = () => {
                                     <Globe size={14} /> Join Meeting
                                   </a>
                                 ) : (
-                                  <span className="text-xs font-bold text-emerald-700 px-4 py-2 bg-emerald-100/50 rounded-xl">Attend in Person ✓</span>
+                                  <span className="text-xs font-bold text-emerald-700 px-4 py-2 bg-emerald-100/50 rounded-xl">Online Session ✓</span>
                                 );
                               })()}
                             </div>
