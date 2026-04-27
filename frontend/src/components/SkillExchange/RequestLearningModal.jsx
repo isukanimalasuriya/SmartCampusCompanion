@@ -175,24 +175,8 @@ const RequestLearningModal = ({ isOpen, onClose, onSuccess }) => {
               </select>
             </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Mode</label>
-              <div className="flex gap-2">
-                {["Online", "Offline"].map(m => (
-                  <button
-                    key={m}
-                    type="button"
-                    onClick={() => setFormData(prev => ({ ...prev, mode: m }))}
-                    className={`flex-1 py-2 rounded-xl border font-medium transition ${formData.mode === m
-                        ? "bg-violet-600 border-violet-600 text-white"
-                        : "border-gray-200 text-gray-600 hover:bg-gray-50"
-                      }`}
-                  >
-                    {m}
-                  </button>
-                ))}
-              </div>
-            </div>
+            {/* Mode selection removed - defaulting to Online */}
+
 
             {/* Availability Section */}
             <div className="space-y-3 pt-2">
